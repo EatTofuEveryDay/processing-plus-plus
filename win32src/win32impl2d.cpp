@@ -168,7 +168,27 @@ void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int,
   hr = __private::pRenderTarget->FillRect(rct, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
 }
-void prxx::triangle(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int){
+void prxx::triangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3){
+  // The problem here is also with overhead.
+  // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling
+  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  ID2D1PathGeometry *path;
+  hr = __private::pFactory->CreatePathGeometry(&path);
+  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
+  ID2D1GeometrySink *sink;
+  hr = path->OpenSink(&sink);
+  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
+  sink->BeginFigure(D2D1::PointF(x1, y1));
+  sink->AddLine(D2D1::PointF(x2, y2));
+  sink->AddLine(D2D1::PointF(x3, y3));
+  sink->AddLine(D2D1::PointF(x1, y1));
+  sink->EndFigure(D2D1_FIGURE_END_OPEN);
+  hr = sink->Close();
+  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
+  hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
+  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
+  hr = __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
+  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
 }
 
