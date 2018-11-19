@@ -1,5 +1,6 @@
 # processing-plus-plus
 
-Status: In development
+v0.0:
+- Status: In development
 
 Processing API implemented in C++.
