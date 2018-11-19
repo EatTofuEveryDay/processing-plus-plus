@@ -51,12 +51,6 @@ namespace prxx {
   double bezierPoint(unsigned int, unsigned int, unsigned int, unsigned int, double);
   double bezierTangent(unsigned int, unsigned int, unsigned int, unsigned int, double);
   
-  // 2d custom shapes
-  void beginShape(void);
-  void bezierVertex(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-  void vertex(unsigned int, unsigned int);
-  void endShape(void);
-  
   // Color
   struct color_t {
     unsigned int r : 8;
@@ -165,7 +159,7 @@ namespace prxx {
   public:
     file_t();
     file_t(std::string, openmode);
-    file_t(file_t);
+    file_t(file_t); // Copy-constructible
     
     void open(std::string, openmode);
     
@@ -177,9 +171,21 @@ namespace prxx {
   }
   
   // Extensions
-  void windowTitle(std::wstring);
-  void windowIcon(std::wstring);
-  
+  void windowTitle(std::string);
+  void windowIcon(std::string);
+  class path_t {
+    __private::base_path p; // Implementation
+  public:
+    path_t();
+    ~path_t();
+    
+    void open();
+    void close();
+    void bezier(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+    void curve(unsigned int, unsigned int);
+    void line(unsigned int, unsigned int);
+    void draw();
+  };  
   // Exceptions
   
   class argument_error : public std::exception {
