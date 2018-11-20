@@ -14,20 +14,21 @@
 namespace prxx {
   namespace __private { /* Implementation-defined */ }
   
-  enum class keycode;
+  enum class keycode; // Implementation-defined
   enum class arcmode {
     OPEN, CHORD, PIE
   }
   struct mouse_state {
     bool down;
-    coord2d pos
+    unsigned int x;
+    unsigned int y;
   };
   
   // Processing
   
   // Drawing
   
-  // 2d primitive
+  // 2d primitive, all implemented
   void createCanvas(unsigned int, unsigned int);
   void arc(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
   void arc(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, arcmode);
@@ -38,7 +39,7 @@ namespace prxx {
   void rect(unsigned int, unsigned int, unsigned int, unsigned int);
   void triangle(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
   
-  // drawing modes
+  // drawing modes, all implemented except fill() and stroke()
   enum class quadMode_t {
     CENTER, RADIUS, CORNER, CORNERS
   };
@@ -80,7 +81,7 @@ namespace prxx {
   public
     image_t();
     image_t(std::string src);
-    image_t(int W, int H);
+    image_t(int, int);
     image_t(image_t);
     
     // Access
@@ -186,7 +187,7 @@ namespace prxx {
     void line(unsigned int, unsigned int);
     void draw();
   };  
-  // Exceptions
+  // Exceptions (implemented)
   
   class argument_error : public std::exception {
     std::string pw;
