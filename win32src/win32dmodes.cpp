@@ -1,3 +1,5 @@
+#include"../include/processing.h"
+
 #include"basewin.h"
 
 #undef EXT
@@ -6,13 +8,22 @@
 void ellipseMode(quadMode_t t){
   __private::staticvarlock.aquire();
   __private::ellipsemode = t;
+  __private::staticvarlock.release();
 }
 void rectMode(quadMode_t t){
+  __private::staticvarlock.aquire();
   __private::rectmode = t;
+  __private::staticvarlock.release();
 }
-void strokeWeight(double);
+void strokeWeight(double w){
+  __private::staticvarlock.aquire();
+  __private::strokewidth = w;
+  __private::staticvarlock.release();
+}
 
-void background(int, int, int, int);
+void background(int, int, int, int){
+  
+}
 void background(color_t);
 void fill(int, int, int, int);
 void fill(color_t);
