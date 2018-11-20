@@ -35,7 +35,7 @@ namespace prxx {
     ;
     EXT unsigned int width;
     EXT unsigned int height;
-    EXT unsigned int strokewidth;
+    EXT double strokewidth;
     EXT quadMode_t rectmode
     #ifndef CEXT
     = quadMode_t::CORNER
