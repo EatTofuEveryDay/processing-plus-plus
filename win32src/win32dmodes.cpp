@@ -3,11 +3,13 @@
 #undef EXT
 #include"win32private.h"
 
-enum class quadMode_t {
-  CENTER, RADIUS, CORNER, CORNERS
-};
-void ellipseMode(quadMode_t);
-void rectMode(quadMode_t);
+void ellipseMode(quadMode_t t){
+  __private::staticvarlock.aquire();
+  __private::ellipsemode = t;
+}
+void rectMode(quadMode_t t){
+  __private::rectmode = t;
+}
 void strokeWeight(double);
 
 void background(int, int, int, int);
