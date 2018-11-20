@@ -27,6 +27,7 @@
 HRESULT MainWindow::CreateGraphicsResources()
 {
     using namespace prxx::__private;
+    staticvarlock.aquire();
     HRESULT hr = S_OK;
     if (pRenderTarget == NULL)
     {
@@ -46,20 +47,24 @@ HRESULT MainWindow::CreateGraphicsResources()
             hr = pRenderTarget->CreateSolidColorBrush(color, &prxx::__private::fillbrush);
         }
     }
+    staticvarlock.release();
     return hr;
 }
 
 void MainWindow::DiscardGraphicsResources()
 {
     using namespace prxx::__private;
+    staticvarlock.aquire();
     SafeRelease(&pRenderTarget);
     SafeRelease(&fillbrush);
     SafeRelease(&strokebrush);
+    staticvarlock.release();
 }
 
 void MainWindow::OnPaint()
 {
   using namespace prxx::__private;
+  staticvarlock.aquire();
   HRESULT hr = CreateGraphicsResources();
   if (SUCCEEDED(hr))
   {
@@ -75,11 +80,13 @@ void MainWindow::OnPaint()
       DiscardGraphicsResources();
     EndPaint(m_hwnd, &ps);
   }
+  staticvarlock.release();
 }
 
 void MainWindow::Resize()
 {
   using namespace prxx::__private;
+  staticvarlock.aquire();
   if (pRenderTarget != NULL)
   {
     RECT rc;
@@ -89,23 +96,29 @@ void MainWindow::Resize()
     pRenderTarget->Resize(size);
     InvalidateRect(m_hwnd, NULL, FALSE);
   }
+  staticvarlock.release();
 }
 
 // WinMain?
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
   using namespace prxx::__private;
+  staticvarlock.aquire();
+  cfn = runningFunc::setup;
+  // Avoid double aquire
+  staticvarlock.release();
   MainWindow win;
-
+  
   setup(); // processing function
   
   // Check if width and height are 0
+  staticvarlock.aquire();
   if(!(width + height))
     return 0;
 
   if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, 0, width, height))
     return 0;
-
+  staticvarlock.release();
   ShowWindow(win.Window(), nCmdShow);
 
   // Run the message loop.
@@ -126,14 +139,18 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_CREATE:
+        staticvarlock.aquire();
         if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
           std::abort();
+        staticvarlock.release();
         return 0;
 
     case WM_DESTROY:
         DiscardGraphicsResources();
+        staticvarlock.aquire();
         SafeRelease(&pFactory);
         PostQuitMessage(0);
+        staticvarlock.release();
         return 0;
 
     case WM_PAINT:
