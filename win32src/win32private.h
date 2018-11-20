@@ -1,6 +1,8 @@
 // processing v0.0
 
 #include<string>
+// Incase they are trying to call fill() and whatnot from another thread
+#include<mutex>
 #include<windows.h>
 #include<d2d1.h>
 #include"../include/processing.h"
