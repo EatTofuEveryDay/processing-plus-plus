@@ -81,12 +81,52 @@ double prxx::mag(double x, double y){
 double prxx::map(double x, double start1, double stop1, double start2, double stop2){
   double rng1 = fabs(start1 - stop1);
   double rng2 = fabs(start2 - stop2);
-  double 
 }
-double prxx::max(...);
-double prxx::max(std::vector<double>);
-double prxx::min(...);
-double prxx::min(std::vector<double>);
+
+template<class T>
+T prxx::max(std::initializer_list<T> l){
+  std::vector<T> v;
+  v.insert(v.end(), l.begin(), l.end());
+  return prxx::max(v);
+}
+
+template<class T>
+T prxx::max(std::vector<T> v){
+  // If the vector has no elements
+  if(!v.size()) return T();
+  // Make sure objects of type T are comparable.
+  bool check = (T() > T()) || (T() == T());
+  T curr = v[0];
+  for(T i : v){
+    if(i > curr){
+      curr = i;
+    }
+  }
+  return curr;
+}
+
+template<class T>
+T prxx::min(std::initializer_list<T>){
+  std::vector<T> v;
+  v.insert(v.end(), l.begin(), l.end());
+  return prxx::max(v);
+}
+
+template<class T>
+T prxx::min(std::vector<T>){
+  // If the vector has no elements
+  if(!v.size()) return T();
+  // Make sure objects of type T are comparable.
+  bool check = (T() > T()) || (T() == T());
+  T curr = v[0];
+  for(T i : v){
+    if(i < curr){
+      curr = i;
+    }
+  }
+  return curr;
+}
+
 double prxx::norm(double, double, double);
 double prxx::pow(double, double);
 double prxx::round(double);
