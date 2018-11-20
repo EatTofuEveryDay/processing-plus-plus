@@ -14,8 +14,10 @@
 void prxx::createCanvas(unsigned int w, unsigned int h){
   if(__private::cfn != runningFunc::setup)
     throw xfunction_error("Must call createCanvas() in setup()");
+  __private::staticvarlock.aquire();
   __private::width = w;
   __private::height = h;
+  __private::staticvarlock.release();
 }
 void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int start, unsigned int stop){
   arc(x, y, w, h, start, stop, OPEN);
@@ -24,7 +26,9 @@ void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
   // I was honestly blown away by the amount of code required to make a simple arc.
   // Use the (to be implemented) path_t class to store long sequences of arc commands.
   // Try not to call this func alone, it introduces much overhead
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.release();
   HRESULT hr; // C-style error handling
   // Make the arc
   D2D1_ARC_SIZE arcSize;
@@ -66,14 +70,17 @@ void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
   SafeRelease(&sink);
+  __private::staticvarlock.aquire();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
   hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
   hr = __private::pRenderTarget->DrawGeometry(path, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
+  __private::staticvarlock.release();
 }
 void prxx::ellipse(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4){
   HRESULT hr; // C-style error handling
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   D2D1_ELLIPSE ellipse;
   switch(__private::ellipsemode){
@@ -108,12 +115,15 @@ void prxx::ellipse(unsigned int p1, unsigned int p2, unsigned int p3, unsigned i
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
   hr = __private::pRenderTarget->FillEllipse(ellipse, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
+  __private::staticvarlock.release();
 }
 void prxx::quad(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int x4, unsigned int y4){
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
-  HRESULT hr; // C-style error handling
+  HRESULT hr; // C-style error handling, I hate winapi
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.release();
   ID2D1PathGeometry *path;
   hr = __private::pFactory->CreatePathGeometry(&path);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
@@ -127,24 +137,31 @@ void prxx::quad(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int 
   sink->AddLine(D2D1::PointF(x1, y1));
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
+  __private::staticvarlock.aquire();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
   hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
   hr = __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
+  __private::staticvarlock.release();
 }
 void prxx::point(unsigned int x, unsigned int y){
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.release();
   line(x, y, x+1, y+1); // No other way to draw a point.
 }
 void prxx::line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
   HRESULT hr; // C-style error handling
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   hr = pRenderTarget->DrawLine(D2D1::PointF(x1, y1), D2D1::PointF(x2, y2), __private::strokebrush, __private::strokewidth);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::line failed");
+  __private::staticvarlock.release();
 }
 void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int, p4){
   HRESULT hr; // C-style error handling
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   D2D1_RECT_F rct;
   switch(__private::rectMode){
@@ -167,12 +184,15 @@ void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int,
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
   hr = __private::pRenderTarget->FillRect(rct, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
+  __private::staticvarlock.release();
 }
 void prxx::triangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3){
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling
+  __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.release();
   ID2D1PathGeometry *path;
   hr = __private::pFactory->CreatePathGeometry(&path);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
@@ -185,10 +205,12 @@ void prxx::triangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned 
   sink->AddLine(D2D1::PointF(x1, y1));
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
+  __private::staticvarlock.aquire();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
   hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
   hr = __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
+  __private::staticvarlock.release();
 }
 
