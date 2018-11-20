@@ -14,6 +14,7 @@
 
 namespace prxx {
   namespace __private {
+    EXT std::mutex staticvarlock;
     EXT std::wstring title;
     EXT ID2D1SolidColorBrush* fillbrush;
     EXT ID2D1SolidColorBrush* strokebrush;
