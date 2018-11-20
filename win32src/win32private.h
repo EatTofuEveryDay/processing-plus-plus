@@ -18,6 +18,8 @@ namespace prxx {
     EXT std::wstring title;
     EXT ID2D1SolidColorBrush* fillbrush;
     EXT ID2D1SolidColorBrush* strokebrush;
+    EXT color_t fillcol; // Incase fillbrush is ever invalidated
+    EXT color_t strokecol;
     enum class runningFunc
     #ifndef CEXT
     {
