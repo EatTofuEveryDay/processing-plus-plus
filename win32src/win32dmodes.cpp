@@ -1,6 +1,7 @@
 #include"../include/processing.h"
 
 #include"basewin.h"
+#include<d2d1.h>
 
 #undef EXT
 #include"win32private.h"
@@ -31,7 +32,13 @@ void background(int r, int g, int b, int a = 0){
 }
 void fill(int r, int g, int b, int a = 0){
   __private::staticvarlock.aquire();
-  // .... Might need to research how later
+  HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
+    D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
+    &__private::fillbrush
+  );
+  if(!SUCCEEDED(hr)){
+    throw xfunction_error("prxx::fill failed");
+  }
   __private::staticvarlock.release();
 }
 void noFill(void){
@@ -39,7 +46,13 @@ void noFill(void){
 }
 void stroke(int r, int g, int b, int a = 0){
   __private::staticvarlock.aquire();
-  // .... Might need to research how later
+  HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
+    D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
+    &__private::strokebrush
+  );
+  if(!SUCCEEDED(hr)){
+    throw xfunction_error("prxx::stroke failed");
+  }
   __private::staticvarlock.release();
 }
 void noStroke(void){
