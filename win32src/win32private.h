@@ -12,6 +12,11 @@
 #define EXT extern
 #endif
 
+void reload_brushes(){
+  fill(__private::fillcol);
+  stroke(__private::strokecol);
+}
+
 namespace prxx {
   namespace __private {
     EXT std::mutex staticvarlock;
