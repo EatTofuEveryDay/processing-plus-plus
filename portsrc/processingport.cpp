@@ -40,12 +40,6 @@ void prxx::stroke(color_t c){
   stroke(c.r, c.g, c.b, c.a);
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::color_t c){
-  out << "Color r: " << red(c) << ", g: " << green(c) << ", b: " << blue(c);
-  if(alpha(c)) out << ", a: " << alpha(c);
-  return out;
-}
-
 double prxx::abs(double x){
   return std::fabs(x);
 }
@@ -141,22 +135,12 @@ constexpr std::string prxx::argument_error::what(){
   return pw;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::argument_error e){
-  out << "Caught prxx::argument_error: " << e.what();
-  return out;
-}
-
 constexpr prxx::xfunction_error::xfunction_error(std::string w) : pw{w}, {}
 
 prxx::xfunction_error::~xfunction_error(void) override {}
 
 constexpr std::string prxx::xfunction_error::what(){
   return pw;
-}
-
-std::ostream& operator<<(std::ostream& out, prxx::xfunction_error e){
-  out << "Caught prxx::xfunction_error: " << e.what();
-  return out;
 }
 
 constexpr prxx::not_implemented_error::not_implemented_error(std::string w) : pw{w}, {}
@@ -167,11 +151,6 @@ constexpr std::string prxx::not_implemented_error::what(){
   return pw;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::not_implemented_error e){
-  out << "Caught prxx::not_implemented_error: " << e.what();
-  return out;
-}
-
 constexpr prxx::drawing_error::drawing_error(std::string w) : pw{w}, {}
 
 prxx::drawing_error::~drawing_error(void) override {}
@@ -180,7 +159,3 @@ constexpr std::string prxx::drawing_error::what(){
   return pw;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::drawing_error e){
-  out << "Caught prxx::drawing_error: " << e.what();
-  return out;
-}
