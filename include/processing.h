@@ -158,7 +158,9 @@ namespace prxx {
     
     std::string read();
     std::string read(unsigned int);
-    void write(std::string);
+    
+    template<class T>
+    void write(T);
     
     void close();
   }
