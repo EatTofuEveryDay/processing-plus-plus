@@ -1,0 +1,38 @@
+#include "../include/processing.h"
+#include<iostream>
+
+std::ostream& operator<<(std::ostream& out, prxx::color_t c){
+  out << "Color r: " << red(c) << ", g: " << green(c) << ", b: " << blue(c);
+  if(alpha(c)) out << ", a: " << alpha(c);
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& out, prxx::argument_error e){
+  out << "Caught prxx::argument_error: " << e.what();
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& out, prxx::xfunction_error e){
+  out << "Caught prxx::xfunction_error: " << e.what();
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& out, prxx::not_implemented_error e){
+  out << "Caught prxx::not_implemented_error: " << e.what();
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& out, prxx::drawing_error e){
+  out << "Caught prxx::drawing_error: " << e.what();
+  return out;
+}
+
+void prxx::println(std::string s){
+  std::cout << s << std::endl;
+}
+
+void prxx::print(std::string s){
+  std::cout << s;
+  std::cout.flush();
+}
+
