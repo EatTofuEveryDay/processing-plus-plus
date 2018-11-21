@@ -41,6 +41,14 @@ void prxx::print(std::string s){
 prxx::file_t::file_t(){}
 
 prxx::file_t::file_t(std::string path, prxx::openmode o){
+  open(path, o);
+}
+
+prxx::file_t::file_t(file_t f){
+  fp = f.fp;
+}
+
+void prxx::file_t::open(std::string path, prxx::openmode o){
   std::ios_base::openmode openm;
   if(o & prxx::openmode::read)
     openm |= std::ios::in;
@@ -55,11 +63,7 @@ prxx::file_t::file_t(std::string path, prxx::openmode o){
   fp = std::fstream(path, openm);
 }
 
-prxx::file_t::file_t(file_t f){
-  fp = f.fp;
-}
-
-std::string prxx::read(){
+std::string prxx::file_t::read(){
   std::string buf;
   std::string tmp;
   while(fp.getline(tmp)){
@@ -68,8 +72,17 @@ std::string prxx::read(){
   return buf;
 }
 
-std::string prxx::read(unsigned int sz){
+std::string prxx::file_t::read(unsigned int sz){
   std::string buf;
   fp.read(buf.c_str(), sz);
   return buf;
+}
+
+template<class T>
+void prxx::file_t::write(T str){
+  fp << str;
+}
+
+void prxx::file_t::close(){
+  fp.close();
 }
