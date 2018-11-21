@@ -13,17 +13,9 @@
 
 namespace prxx {
   namespace __private { /* Implementation-defined */ }
-  
-  enum class keycode; // Implementation-defined
   enum class arcmode {
     OPEN, CHORD, PIE
   }
-  struct mouse_state {
-    bool down;
-    unsigned int x;
-    unsigned int y;
-  };
-  
   // Processing
   
   // Drawing
@@ -232,12 +224,12 @@ int setup(std::vector<std::string> cmdLine);
 void draw(void);
 void windowResized(unsigned int x, unsigned int y);
 
-void mouseClicked(prxx::mouse_state);
-void mouseReleased(prxx::mouse_state);
-void mouseMoved(prxx::mouse_state);
+void mouseClicked();
+void mouseReleased();
+void mouseMoved();
 
-void keyPressed(prxx::keycode);
-void keyReleased(prxx::keycode);
+void keyPressed(char);
+void keyReleased(char);
 
 // If functions don't exist
 // Avoid undefined reference errors
