@@ -10,11 +10,6 @@
 // For SafeRelease
 #include "basewin.h"
 
-void reload_brushes(){
-  fill(__private::fillcol);
-  stroke(__private::strokecol);
-}
-
 // Just the 2d primitives in this file
 void prxx::createCanvas(unsigned int w, unsigned int h){
   if(__private::cfn != runningFunc::setup)
