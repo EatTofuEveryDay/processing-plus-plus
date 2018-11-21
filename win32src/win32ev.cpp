@@ -64,6 +64,7 @@ void MainWindow::DiscardGraphicsResources()
 void MainWindow::OnPaint()
 {
   using namespace prxx::__private;
+  reload_brushes();
   staticvarlock.aquire();
   HRESULT hr = CreateGraphicsResources();
   if (SUCCEEDED(hr))
