@@ -222,7 +222,7 @@ namespace prxx {
 
 // Events
 
-int setup(std::vector<std::string> cmdLine);
+int setup(void);
 void draw(void);
 void windowResized(unsigned int x, unsigned int y);
 

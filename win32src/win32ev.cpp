@@ -161,6 +161,12 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         Resize();
         return 0;
+	case WM_KEYDOWN:
+		keyPressed((char)wParam);
+		return 0;
+	case WM_KEYUP:
+		keyReleased((char)wParam);
+		return 0;
     }
     return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }

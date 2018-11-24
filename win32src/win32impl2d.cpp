@@ -159,7 +159,7 @@ void prxx::line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int 
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::line failed");
   __private::staticvarlock.release();
 }
-void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int, p4){
+void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4){
   HRESULT hr; // C-style error handling
   __private::staticvarlock.aquire();
   if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
