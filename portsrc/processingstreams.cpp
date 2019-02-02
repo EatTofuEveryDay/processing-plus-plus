@@ -44,21 +44,18 @@ prxx::file_t::file_t(std::string path, prxx::openmode o){
   open(path, o);
 }
 
-prxx::file_t::file_t(file_t f){
-  fp = f.fp;
-}
-
 void prxx::file_t::open(std::string path, prxx::openmode o){
+  int i = int(o);
   std::ios_base::openmode openm;
-  if(o & prxx::openmode::read)
+  if(i & int(prxx::openmode::read))
     openm |= std::ios::in;
-  if(o & prxx::openmode::write)
+  if(i & int(prxx::openmode::write))
     openm |= std::ios::out;
-  if(o & prxx::openmode::append)
+  if(i & int(prxx::openmode::append))
     openm |= std::ios::app;
-  if(o & prxx::openmode::trunc)
+  if(i & int(prxx::openmode::trunc))
     openm |= std::ios::trunc;
-  if(o & prxx::openmode::binary)
+  if(i & int(prxx::openmode::binary))
     openm |= std::ios::binary;
   fp = std::fstream(path, openm);
 }
@@ -66,16 +63,18 @@ void prxx::file_t::open(std::string path, prxx::openmode o){
 std::string prxx::file_t::read(){
   std::string buf;
   std::string tmp;
-  while(fp.getline(tmp)){
+  while(std::getline(fp, tmp)){
     buf += tmp;
   }
   return buf;
 }
 
 std::string prxx::file_t::read(unsigned int sz){
-  std::string buf;
-  fp.read(buf.c_str(), sz);
-  return buf;
+  char* buf = new char[sz];
+  fp.read(buf, sz);
+  std::string ret(buf);
+  delete[] buf;
+  return ret;
 }
 
 template<class T>

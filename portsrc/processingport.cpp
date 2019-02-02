@@ -3,6 +3,10 @@
 #include<string>
 #include<cmath>
 
+// Frickin windows API macros
+#undef max
+#undef min
+
 prxx::color_t prxx::color(int r, int g, int b, int a = 0){
   prxx::color_t c;
   c.r = r;
@@ -66,7 +70,7 @@ double prxx::lerp(double x, double start, double stop){
 double prxx::log(double x){
   return std::log(x);
 }
-double prxx::log10(double){
+double prxx::log10(double x){
   return std::log10(x);
 }
 double prxx::mag(double x, double y){
@@ -100,14 +104,14 @@ T prxx::max(std::vector<T> v){
 }
 
 template<class T>
-T prxx::min(std::initializer_list<T>){
+T prxx::min(std::initializer_list<T> l){
   std::vector<T> v;
   v.insert(v.end(), l.begin(), l.end());
-  return prxx::max(v);
+  return prxx::min(v);
 }
 
 template<class T>
-T prxx::min(std::vector<T>){
+T prxx::min(std::vector<T> v){
   // If the vector has no elements
   if(!v.size()) return T();
   // Make sure objects of type T are comparable.
@@ -124,38 +128,38 @@ T prxx::min(std::vector<T>){
 double prxx::norm(double, double, double);
 double prxx::pow(double, double);
 double prxx::round(double);
-unsigned double prxx::sq(double);
-double prxx::sqrt(unsigned double);
+double prxx::sq(double);
+double prxx::sqrt(double);
 
-constexpr prxx::argument_error::argument_error(std::string w) : pw {w}, {}
+prxx::argument_error::argument_error(std::string w) : pw {w} {}
 
-prxx::argument_error::~argument_error(void) override {}
+prxx::argument_error::~argument_error(void) {}
 
-constexpr std::string prxx::argument_error::what(){
+std::string prxx::argument_error::what(){
   return pw;
 }
 
-constexpr prxx::xfunction_error::xfunction_error(std::string w) : pw{w}, {}
+prxx::xfunction_error::xfunction_error(std::string w) : pw{w} {}
 
-prxx::xfunction_error::~xfunction_error(void) override {}
+prxx::xfunction_error::~xfunction_error(void) {}
 
-constexpr std::string prxx::xfunction_error::what(){
+std::string prxx::xfunction_error::what(){
   return pw;
 }
 
-constexpr prxx::not_implemented_error::not_implemented_error(std::string w) : pw{w}, {}
+prxx::not_implemented_error::not_implemented_error(std::string w) : pw{w} {}
 
-prxx::not_implemented_error::~not_implemented_error(void) override {}
+prxx::not_implemented_error::~not_implemented_error(void) {}
 
-constexpr std::string prxx::not_implemented_error::what(){
+std::string prxx::not_implemented_error::what(){
   return pw;
 }
 
-constexpr prxx::drawing_error::drawing_error(std::string w) : pw{w}, {}
+prxx::drawing_error::drawing_error(std::string w) : pw{w} {}
 
-prxx::drawing_error::~drawing_error(void) override {}
+prxx::drawing_error::~drawing_error(void) {}
 
-constexpr std::string prxx::drawing_error::what(){
+std::string prxx::drawing_error::what(){
   return pw;
 }
 

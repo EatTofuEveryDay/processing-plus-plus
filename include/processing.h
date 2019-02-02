@@ -8,14 +8,23 @@
 #include<exception>
 #include<cmath>
 
+#ifdef _WIN32
+// Frickin windows API macros
+#undef max
+#undef min
+#include"../win32src/win32fwd.h"
+#endif
+
 // processing reference
 // https://processing.org/reference/
 
 namespace prxx {
-  namespace __private { /* Implementation-defined */ }
-  enum class arcmode {
-    OPEN, CHORD, PIE
+  namespace __private { /* Implementation-defined */
+	class base_path;
   }
+  enum class arcmode {
+	  OPEN, CHORD, PIE
+  };
   // Processing
   
   // Drawing
@@ -70,18 +79,18 @@ namespace prxx {
   class image_t {
     std::string src;
     std::vector<std::vector<color_t> > bmp;
-  public
+  public:
     image_t();
     image_t(std::string src);
     image_t(int, int);
-    image_t(image_t);
+    image_t(image_t&);
     
     // Access
     std::string& source();
     std::vector<std::vector<color_t> >& bitmap();
     
     void load(void);
-  }
+  };
   
   void image(image_t, unsigned int, unsigned int);
   void imageMode(quadMode_t);
@@ -106,15 +115,19 @@ namespace prxx {
   double log10(double);
   double mag(double, double);
   double map(double, double, double, double, double);
-  double max(std::initializer_list<double>);
-  double max(std::vector<double>);
-  double min(std::initializer_list<double>);
-  double min(std::vector<double>);
+  template<class T>
+  T max(std::initializer_list<T> l);
+  template<class T>
+  T max(std::vector<T> v);
+  template<class T>
+  T min(std::initializer_list<T> l);
+  template<class T>
+  T min(std::vector<T> v);
   double norm(double, double, double);
   double pow(double, double);
   double round(double);
-  unsigned double sq(double);
-  double sqrt(unsigned double);
+  double sq(double);
+  double sqrt(double);
   
   // Constants
   constexpr double PI = 3.141592653589;
@@ -134,9 +147,9 @@ namespace prxx {
   double atan2(double);
   double degrees(double);
   double radians(double);
-  enum class trigMode {
-    deg, rad
-  }
+  enum class trigMode_t {
+	  deg, rad
+  };
   double trigMode(trigMode_t);
   
   // File handling
@@ -152,7 +165,7 @@ namespace prxx {
   public:
     file_t();
     file_t(std::string, openmode);
-    file_t(file_t); // Copy-constructible
+	// Not Copy-constructible
     
     void open(std::string, openmode);
     
@@ -163,7 +176,7 @@ namespace prxx {
     void write(T);
     
     void close();
-  }
+  };
   
   // Extensions
   void windowTitle(std::string);
@@ -190,7 +203,7 @@ namespace prxx {
     ~argument_error(void) override;
     
     std::string what();
-  }
+  };
   
   class xfunction_error : public std::exception {
     std::string pw;
@@ -199,7 +212,7 @@ namespace prxx {
     ~xfunction_error(void) override;
     
     std::string what();
-  }
+  };
   
   class not_implemented_error : public std::exception {
     std::string pw;
@@ -208,7 +221,7 @@ namespace prxx {
     ~not_implemented_error(void) override;
     
     std::string what();
-  }
+  };
   
   class drawing_error : public std::exception {
     std::string pw;
@@ -217,8 +230,12 @@ namespace prxx {
     ~drawing_error(void) override;
     
     std::string what();
-  }
+  };
 }
+
+#ifdef _WIN32
+#include"../win32src/win32private.h"
+#endif
 
 // Events
 

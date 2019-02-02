@@ -2,36 +2,37 @@
 
 #include"basewin.h"
 #include<d2d1.h>
+#include<cmath>
 
 #undef EXT
 #include"win32private.h"
 
-void ellipseMode(quadMode_t t){
-  __private::staticvarlock.aquire();
+void prxx::ellipseMode(prxx::quadMode_t t){
+  __private::staticvarlock.lock();
   __private::ellipsemode = t;
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
-void rectMode(quadMode_t t){
-  __private::staticvarlock.aquire();
+void prxx::rectMode(prxx::quadMode_t t){
+  __private::staticvarlock.lock();
   __private::rectmode = t;
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
-void strokeWeight(double w){
-  __private::staticvarlock.aquire();
+void prxx::strokeWeight(double w){
+  __private::staticvarlock.lock();
   __private::strokewidth = w;
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
 
-void background(int r, int g, int b, int a = 0){
-  __private::staticvarlock.aquire();
+void prxx::background(int r, int g, int b, int a = 0){
+  __private::staticvarlock.lock();
   double w = __private::width;
   double h = __private::height;
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
   fill(r, g, b, a);
-  rect(0, 0, w, h);
+  rect(0, 0, std::floor(w), std::floor(h));
 }
-void fill(int r, int g, int b, int a = 0){
-  __private::staticvarlock.aquire();
+void prxx::fill(int r, int g, int b, int a = 0){
+  __private::staticvarlock.lock();
   HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
     D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
     &__private::fillbrush
@@ -39,13 +40,13 @@ void fill(int r, int g, int b, int a = 0){
   if(!SUCCEEDED(hr)){
     throw xfunction_error("prxx::fill failed");
   }
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
-void noFill(void){
+void prxx::noFill(void){
   fill(0, 0, 0, 255);
 }
-void stroke(int r, int g, int b, int a = 0){
-  __private::staticvarlock.aquire();
+void prxx::stroke(int r, int g, int b, int a = 0){
+  __private::staticvarlock.lock();
   HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
     D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
     &__private::strokebrush
@@ -53,8 +54,8 @@ void stroke(int r, int g, int b, int a = 0){
   if(!SUCCEEDED(hr)){
     throw xfunction_error("prxx::stroke failed");
   }
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
-void noStroke(void){
+void prxx::noStroke(void){
   stroke(0, 0, 0, 255);
 }

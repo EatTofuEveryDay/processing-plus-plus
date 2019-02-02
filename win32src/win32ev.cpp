@@ -27,7 +27,7 @@
 HRESULT MainWindow::CreateGraphicsResources()
 {
     using namespace prxx::__private;
-    staticvarlock.aquire();
+    staticvarlock.lock();
     HRESULT hr = S_OK;
     if (pRenderTarget == NULL)
     {
@@ -47,25 +47,25 @@ HRESULT MainWindow::CreateGraphicsResources()
             hr = pRenderTarget->CreateSolidColorBrush(color, &prxx::__private::fillbrush);
         }
     }
-    staticvarlock.release();
+    staticvarlock.unlock();
     return hr;
 }
 
 void MainWindow::DiscardGraphicsResources()
 {
     using namespace prxx::__private;
-    staticvarlock.aquire();
+    staticvarlock.lock();
     SafeRelease(&pRenderTarget);
     SafeRelease(&fillbrush);
     SafeRelease(&strokebrush);
-    staticvarlock.release();
+    staticvarlock.unlock();
 }
 
 void MainWindow::OnPaint()
 {
   using namespace prxx::__private;
   reload_brushes();
-  staticvarlock.aquire();
+  staticvarlock.lock();
   HRESULT hr = CreateGraphicsResources();
   if (SUCCEEDED(hr))
   {
@@ -73,21 +73,21 @@ void MainWindow::OnPaint()
     BeginPaint(m_hwnd, &ps);
     pRenderTarget->BeginDraw();
     // make sure that processing draw calls are being called in draw()
-    prxx::__private::cfn = prxx::__private::draw;
+    cfn = runningFunc::draw;
     draw(); // processing function
-    prxx::__private::cfn = prxx::__private::null;
+    cfn = runningFunc::null;
     hr = pRenderTarget->EndDraw();
     if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET)
       DiscardGraphicsResources();
     EndPaint(m_hwnd, &ps);
   }
-  staticvarlock.release();
+  staticvarlock.unlock();
 }
 
 void MainWindow::Resize()
 {
   using namespace prxx::__private;
-  staticvarlock.aquire();
+  staticvarlock.lock();
   if (pRenderTarget != NULL)
   {
     RECT rc;
@@ -97,29 +97,29 @@ void MainWindow::Resize()
     pRenderTarget->Resize(size);
     InvalidateRect(m_hwnd, NULL, FALSE);
   }
-  staticvarlock.release();
+  staticvarlock.unlock();
 }
 
 // WinMain?
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
   using namespace prxx::__private;
-  staticvarlock.aquire();
+  staticvarlock.lock();
   cfn = runningFunc::setup;
   // Avoid double aquire
-  staticvarlock.release();
+  staticvarlock.unlock();
   MainWindow win;
   
   setup(); // processing function
   
   // Check if width and height are 0
-  staticvarlock.aquire();
+  staticvarlock.lock();
   if(!(width + height))
     return 0;
 
   if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, 0, width, height))
     return 0;
-  staticvarlock.release();
+  staticvarlock.unlock();
   ShowWindow(win.Window(), nCmdShow);
 
   // Run the message loop.
@@ -140,18 +140,18 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_CREATE:
-        staticvarlock.aquire();
+        staticvarlock.lock();
         if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
           std::abort();
-        staticvarlock.release();
+        staticvarlock.unlock();
         return 0;
 
     case WM_DESTROY:
         DiscardGraphicsResources();
-        staticvarlock.aquire();
+        staticvarlock.lock();
         SafeRelease(&pFactory);
         PostQuitMessage(0);
-        staticvarlock.release();
+        staticvarlock.unlock();
         return 0;
 
     case WM_PAINT:

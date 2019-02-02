@@ -7,53 +7,62 @@
 #include<d2d1.h>
 #include"../include/processing.h"
 
-#ifndef EXT
-#define CEXT 1
-#define EXT extern
-#endif
-
-void reload_brushes(){
-  fill(__private::fillcol);
-  stroke(__private::strokecol);
-}
+#ifdef EXT
 
 namespace prxx {
   namespace __private {
-    EXT std::mutex staticvarlock;
-    EXT std::wstring title;
-    EXT ID2D1SolidColorBrush* fillbrush;
-    EXT ID2D1SolidColorBrush* strokebrush;
-    EXT color_t fillcol; // Incase fillbrush is ever invalidated
-    EXT color_t strokecol;
-    enum class runningFunc
-    #ifndef CEXT
+    std::mutex staticvarlock;
+    std::wstring title;
+    ID2D1SolidColorBrush* fillbrush;
+    ID2D1SolidColorBrush* strokebrush;
+    prxx::color_t fillcol; // Incase fillbrush is ever invalidated
+    prxx::color_t strokecol;
+    enum class runningFunc 
     {
       null,
       setup,
       draw,
       event
-    }
-    #endif
-    ;
-    EXT runningFunc cfn
-    #ifndef CEXT
-    = runningFunc::null
-    #endif
-    ;
-    EXT unsigned int width;
-    EXT unsigned int height;
-    EXT double strokewidth;
-    EXT quadMode_t rectmode
-    #ifndef CEXT
-    = quadMode_t::CORNER
-    #endif
-    ;
-    EXT quadMode_t ellipsemode
-    #ifndef CEXT
-    = quadMode_t::CENTER
-    #endif
-    ;
-    EXT ID2D1Factory            *pFactory;
-    EXT ID2D1HwndRenderTarget   *pRenderTarget;
+	};
+    runningFunc cfn = runningFunc::null;
+    unsigned int width;
+    unsigned int height;
+    double strokewidth;
+    quadMode_t rectmode = quadMode_t::CORNER;
+    quadMode_t ellipsemode = quadMode_t::CENTER;
+    ID2D1Factory            *pFactory;
+    ID2D1HwndRenderTarget   *pRenderTarget;
+  }
+  void reload_brushes() {
+	 fill(__private::fillcol);
+	 stroke(__private::strokecol);
   }
 }
+
+#else
+
+namespace prxx {
+	namespace __private {
+		extern std::mutex staticvarlock;
+		extern std::wstring title;
+		extern ID2D1SolidColorBrush* fillbrush;
+		extern ID2D1SolidColorBrush* strokebrush;
+		extern prxx::color_t fillcol; // Incase fillbrush is ever invalidated
+		extern prxx::color_t strokecol;
+		enum class runningFunc;
+		extern runningFunc cfn;
+		extern unsigned int width;
+		extern unsigned int height;
+		extern double strokewidth;
+		extern quadMode_t rectmode;
+		extern quadMode_t ellipsemode;
+		extern ID2D1Factory            *pFactory;
+		extern ID2D1HwndRenderTarget   *pRenderTarget;
+	}
+	void reload_brushes() {
+		fill(__private::fillcol);
+		stroke(__private::strokecol);
+	}
+}
+
+#endif
