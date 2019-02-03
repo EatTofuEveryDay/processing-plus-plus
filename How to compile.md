@@ -5,12 +5,13 @@ Simple.
 1. Build the library.
 
 All platforms:
-  `portsrc/processingport.cpp`
+  `portsrc/*`
 
 Windows:
-  `win32/*`
+  `win32src/*`
 
-Mac: WIP
+Mac:
+  `osxsrc/*`
 
 Produce a .lib or .dll file from these sources.
 
