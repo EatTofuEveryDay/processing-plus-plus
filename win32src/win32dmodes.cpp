@@ -4,7 +4,7 @@
 #include<d2d1.h>
 #include<cmath>
 
-#undef EXT
+#define EXT
 #include"win32private.h"
 
 void prxx::ellipseMode(prxx::quadMode_t t){
@@ -29,12 +29,12 @@ void prxx::background(int r, int g, int b, int a = 0){
   double h = __private::height;
   __private::staticvarlock.unlock();
   fill(r, g, b, a);
-  rect(0, 0, std::floor(w), std::floor(h));
+  rect(0, 0, (int)std::floor(w), (int)std::floor(h));
 }
 void prxx::fill(int r, int g, int b, int a = 0){
   __private::staticvarlock.lock();
   HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
-    D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
+    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255) ),
     &__private::fillbrush
   );
   if(!SUCCEEDED(hr)){
@@ -48,7 +48,7 @@ void prxx::noFill(void){
 void prxx::stroke(int r, int g, int b, int a = 0){
   __private::staticvarlock.lock();
   HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
-    D2D1::ColorF(D2D1::ColorF(r / 255,  g / 255, b / 255, 1 - (a / 255) )),
+    D2D1::ColorF(D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255) )),
     &__private::strokebrush
   );
   if(!SUCCEEDED(hr)){

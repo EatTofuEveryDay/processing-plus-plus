@@ -30,15 +30,15 @@ namespace prxx {
   // Drawing
   
   // 2d primitive, all implemented
-  void createCanvas(unsigned int, unsigned int);
-  void arc(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-  void arc(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, arcmode);
-  void ellipse(unsigned int, unsigned int, unsigned int, unsigned int);
-  void quad(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-  void point(unsigned int, unsigned int);
-  void line(unsigned int, unsigned int, unsigned int, unsigned int);
-  void rect(unsigned int, unsigned int, unsigned int, unsigned int);
-  void triangle(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+  void createCanvas(double, double);
+  void arc(double, double, double, double, double, double);
+  void arc(double, double, double, double, double, double, arcmode);
+  void ellipse(double, double, double, double);
+  void quad(double, double, double, double, double, double, double, double);
+  void point(double, double);
+  void line(double, double, double, double);
+  void rect(double, double, double, double);
+  void triangle(double, double, double, double, double, double);
   
   // drawing modes, all implemented except fill() and stroke()
   enum class quadMode_t {
@@ -49,9 +49,9 @@ namespace prxx {
   void strokeWeight(double);
   
   // 2d curves (probably not supported soon)
-  void bezier(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-  double bezierPoint(unsigned int, unsigned int, unsigned int, unsigned int, double);
-  double bezierTangent(unsigned int, unsigned int, unsigned int, unsigned int, double);
+  void bezier(double, double, double, double, double, double, double, double);
+  double bezierPoint(double, double, double, double, double);
+  double bezierTangent(double, double, double, double, double);
   
   // Color
   struct color_t {
@@ -234,6 +234,7 @@ namespace prxx {
 }
 
 #ifdef _WIN32
+#define EXT
 #include"../win32src/win32private.h"
 #endif
 
@@ -253,12 +254,12 @@ void keyReleased(char);
 // If functions don't exist
 // Avoid undefined reference errors
 // Note: draw and setup must exist
-void mouseClicked(...){}
-void mouseReleased(...){}
-void mouseMoved(...){}
+void mouseClicked(...);
+void mouseReleased(...);
+void mouseMoved(...);
 
-void keyPressed(...){}
-void keyReleased(...){}
-void windowResized(...){}
+void keyPressed(...);
+void keyReleased(...);
+void windowResized(...);
 
 #endif

@@ -3,5 +3,12 @@ namespace prxx {
 	class base_path {
 	  //TODO
 	};
+	enum class runningFunc
+	{
+		null,
+		setup,
+		draw,
+		event
+	};
   }
 }

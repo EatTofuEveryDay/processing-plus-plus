@@ -16,7 +16,7 @@
 
 #include "../include/processing.h"
 
-#define EXT /* */
+#undef EXT
 // Not external
 #include "win32private.h"
 
@@ -64,7 +64,8 @@ void MainWindow::DiscardGraphicsResources()
 void MainWindow::OnPaint()
 {
   using namespace prxx::__private;
-  reload_brushes();
+  prxx::fill(fillcol);
+  prxx::stroke(strokecol);
   staticvarlock.lock();
   HRESULT hr = CreateGraphicsResources();
   if (SUCCEEDED(hr))
@@ -117,7 +118,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
   if(!(width + height))
     return 0;
 
-  if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, 0, width, height))
+  if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, 0, (int)std::floor(width), (int)std::floor(height)))
     return 0;
   staticvarlock.unlock();
   ShowWindow(win.Window(), nCmdShow);
@@ -170,3 +171,15 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }
+
+
+// If functions don't exist
+// Avoid undefined reference errors
+// Note: draw and setup must exist
+void mouseClicked(...) {}
+void mouseReleased(...) {}
+void mouseMoved(...) {}
+
+void keyPressed(...) {}
+void keyReleased(...) {}
+void windowResized(...) {}

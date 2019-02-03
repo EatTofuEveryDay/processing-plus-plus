@@ -3,10 +3,6 @@
 #include<string>
 #include<cmath>
 
-// Frickin windows API macros
-#undef max
-#undef min
-
 prxx::color_t prxx::color(int r, int g, int b, int a = 0){
   prxx::color_t c;
   c.r = r;
@@ -79,6 +75,8 @@ double prxx::mag(double x, double y){
 double prxx::map(double x, double start1, double stop1, double start2, double stop2){
   double rng1 = fabs(start1 - stop1);
   double rng2 = fabs(start2 - stop2);
+  double unmapped = (x - start1) / rng1;
+  return unmapped * rng2 + start2;
 }
 
 template<class T>

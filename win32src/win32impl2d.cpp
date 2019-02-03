@@ -2,33 +2,35 @@
 
 #include "../include/processing.h"
 
-// Without defining EXT macro we are extern
-// Just in case
-#undef EXT
+#define EXT
 #include "win32private.h"
 
 // For SafeRelease
 #include "basewin.h"
 
+bool prxx::__private::operator!=(prxx::__private::runningFunc a, prxx::__private::runningFunc b) {
+	return !(a == b);
+}
+
 // Just the 2d primitives in this file
-void prxx::createCanvas(unsigned int w, unsigned int h){
-  if(__private::cfn != runningFunc::setup)
+void prxx::createCanvas(double w, double h){
+  __private::staticvarlock.lock();
+  if(__private::cfn != __private::runningFunc::setup)
     throw xfunction_error("Must call createCanvas() in setup()");
-  __private::staticvarlock.aquire();
   __private::width = w;
   __private::height = h;
-  __private::staticvarlock.release();
+  __private::staticvarlock.unlock();
 }
-void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int start, unsigned int stop){
-  arc(x, y, w, h, start, stop, OPEN);
+void prxx::arc(double x, double y, double w, double h, double start, double stop){
+  arc(x, y, w, h, start, stop, arcmode::OPEN);
 }
-void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int start, unsigned int stop, prxx::arcmode m){
+void prxx::arc(double x, double y, double w, double h, double start, double stop, prxx::arcmode m){
   // I was honestly blown away by the amount of code required to make a simple arc.
   // Use the (to be implemented) path_t class to store long sequences of arc commands.
   // Try not to call this func alone, it introduces much overhead
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
-  __private::staticvarlock.release();
+  __private::staticvarlock.lock();
+  if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.unlock();
   HRESULT hr; // C-style error handling
   // Make the arc
   D2D1_ARC_SIZE arcSize;
@@ -42,14 +44,14 @@ void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
   double sinst = std::sin(start);
   double radst = (w * h) / std::sqrt(w * w * cosst * cosst + h * h * sinst * sinst);
   // Use trig to calculate the startpoint
-  auto startpoint = D2D1::Point2F(x + cosst * radst, y + sinst * radst);
+  auto startpoint = D2D1::Point2F(FLOAT(x + cosst * radst), FLOAT(y + sinst * radst));
   // Repeat process for endpoint
   double cossp = std::cos(stop);
   double sinsp = std::sin(stop);
   double radsp = (w * h) / std::sqrt(w * w * cossp * cossp + h * h * sinsp * sinsp);
-  auto stoppoint = D2D1::Point2F(x + cossp * radsp, y + sinsp * radsp);
+  auto stoppoint = D2D1::Point2F(FLOAT(x + cossp * radsp), FLOAT(y + sinsp * radsp));
   // Size of ellipse is the arguments supplied
-  auto size = D2D1::SizeF(w, h);
+  auto size = D2D1::SizeF(FLOAT(w), FLOAT(h));
   auto dr = D2D1::ArcSegment(stoppoint, size, 0, D2D1_SWEEP_DIRECTION_CLOCKWISE, arcSize);
   // Begin creating the geometry
   ID2D1PathGeometry* path;
@@ -64,153 +66,139 @@ void prxx::arc(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
   if(m == arcmode::CHORD){
     sink->AddLine(startpoint);
   }else if(m == arcmode::PIE){
-    sink->AddLine(D2D1::Point2F(x, y));
+    sink->AddLine(D2D1::Point2F(FLOAT(x), FLOAT(y)));
     sink->AddLine(startpoint);
   }
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
   SafeRelease(&sink);
-  __private::staticvarlock.aquire();
+  __private::staticvarlock.lock();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
-  hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
-  hr = __private::pRenderTarget->DrawGeometry(path, __private::fillbrush);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
-  __private::staticvarlock.release();
+  __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->DrawGeometry(path, __private::fillbrush);
+  __private::staticvarlock.unlock();
 }
-void prxx::ellipse(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4){
-  HRESULT hr; // C-style error handling
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+void prxx::ellipse(double p1, double p2, double p3, double p4){
+  __private::staticvarlock.lock();
+  if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.unlock();
   D2D1_ELLIPSE ellipse;
+  D2D_POINT_2F point;
   switch(__private::ellipsemode){
     case quadMode_t::CENTER:
-      D2D_POINT_2F point;
-      point.x = p1;
-      point.y = p2;
-      ellipse = D2D1::ellipse(point, p3, p4);
+      point.x = FLOAT(p1);
+      point.y = FLOAT(p2);
+      ellipse = D2D1::Ellipse(point, FLOAT(p3), FLOAT(p4));
       break;
     case quadMode_t::RADIUS:
-      D2D_POINT_2F point;
-      point.x = p1;
-      point.y = p2;
-      ellipse = D2D1::ellipse(point, p3 / 2, p4 / 2);
+      point.x = FLOAT(p1);
+      point.y = FLOAT(p2);
+      ellipse = D2D1::Ellipse(point, FLOAT(p3 / 2), FLOAT(p4 / 2));
       break;
     case quadMode_t::CORNER:
-      D2D_POINT_2F point;
-      point.x = p1 + p3 / 2;
-      point.y = p2 + p4 / 2;
-      ellipse = D2D1::ellipse(point, p3, p4);
+      point.x = FLOAT(p1 + p3 / 2);
+      point.y = FLOAT(p2 + p4 / 2);
+      ellipse = D2D1::Ellipse(point, FLOAT(p3), FLOAT(p4));
       break;
     case quadMode_t::CORNERS:
-      D2D_POINT_2F point;
-      point.x = p1 + (p3 - p1) / 2;
-      point.y = p2 + (p4 - p2) / 2;
-      ellipse = D2D1::ellipse(point, p3 - p1, p4 - p2);
+      point.x = FLOAT(p1 + (p3 - p1) / 2);
+      point.y = FLOAT(p2 + (p4 - p2) / 2);
+      ellipse = D2D1::Ellipse(point, FLOAT(p3 - p1), FLOAT(p4 - p2));
       break;
     default:
       throw xfunction_error("Invalid ellipseMode");
   }
-  hr = __private::pRenderTarget->DrawEllipse(ellipse, __private::strokebrush, __private::strokewidth, NULL);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
-  hr = __private::pRenderTarget->FillEllipse(ellipse, __private::fillbrush);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
-  __private::staticvarlock.release();
+  __private::pRenderTarget->DrawEllipse(ellipse, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->FillEllipse(ellipse, __private::fillbrush);
+  __private::staticvarlock.unlock();
 }
-void prxx::quad(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int x4, unsigned int y4){
+void prxx::quad(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4){
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling, I hate winapi
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
-  __private::staticvarlock.release();
+  __private::staticvarlock.lock();
+  if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.unlock();
   ID2D1PathGeometry *path;
   hr = __private::pFactory->CreatePathGeometry(&path);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
   ID2D1GeometrySink *sink;
-  hr = path->OpenSink(&sink);
+  hr = path->Open(&sink);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
-  sink->BeginFigure(D2D1::PointF(x1, y1));
-  sink->AddLine(D2D1::PointF(x2, y2));
-  sink->AddLine(D2D1::PointF(x3, y3));
-  sink->AddLine(D2D1::PointF(x4, y4));
-  sink->AddLine(D2D1::PointF(x1, y1));
+  sink->BeginFigure(D2D1::Point2F(FLOAT(x1), FLOAT(y1)), D2D1_FIGURE_BEGIN::D2D1_FIGURE_BEGIN_FILLED);
+  sink->AddLine(D2D1::Point2F(FLOAT(x2), FLOAT(y2)));
+  sink->AddLine(D2D1::Point2F(FLOAT(x3), FLOAT(y3)));
+  sink->AddLine(D2D1::Point2F(FLOAT(x4), FLOAT(y4)));
+  sink->AddLine(D2D1::Point2F(FLOAT(x1), FLOAT(y1)));
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
-  __private::staticvarlock.aquire();
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
-  hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
-  hr = __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
-  __private::staticvarlock.release();
+  if (!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
+  __private::staticvarlock.lock();
+  __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
+  __private::staticvarlock.unlock();
 }
-void prxx::point(unsigned int x, unsigned int y){
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
-  __private::staticvarlock.release();
+void prxx::point(double x, double y){
+  __private::staticvarlock.lock();
+  if(__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.unlock();
   line(x, y, x+1, y+1); // No other way to draw a point.
 }
-void prxx::line(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2){
-  HRESULT hr; // C-style error handling
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
-  hr = pRenderTarget->DrawLine(D2D1::PointF(x1, y1), D2D1::PointF(x2, y2), __private::strokebrush, __private::strokewidth);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::line failed");
-  __private::staticvarlock.release();
+void prxx::line(double x1, double y1, double x2, double y2){
+  __private::staticvarlock.lock();
+  if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::pRenderTarget->DrawLine(D2D1::Point2F(FLOAT(x1), FLOAT(y1)), D2D1::Point2F(FLOAT(x2), FLOAT(y2)), __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::staticvarlock.unlock();
 }
-void prxx::rect(unsigned int p1, unsigned int p2, unsigned int p3, unsigned int p4){
-  HRESULT hr; // C-style error handling
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+void prxx::rect(double p1, double p2, double p3, double p4){
+  using namespace prxx::__private;
+  staticvarlock.lock();
+  if(cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   D2D1_RECT_F rct;
-  switch(__private::rectMode){
-    case rectMode::CENTER:
-      rct = D2D1::RectF(p1 - p3/2, p2 - p4/2, p1 + p3/2, p2 + p4/2);
+  switch(__private::rectmode){
+    case quadMode_t::CENTER:
+      rct = D2D1::RectF(FLOAT(p1 - p3/2), FLOAT(p2 - p4/2), FLOAT(p1 + p3/2), FLOAT(p2 + p4/2));
       break;
-    case rectMode::RADIUS:
-      rct = D2D1::RectF(p1 - p3, p2 - p4, p1 + p3, p2 + p4);
+    case quadMode_t::RADIUS:
+      rct = D2D1::RectF(FLOAT(p1 - p3), FLOAT(p2 - p4), FLOAT(p1 + p3), FLOAT(p2 + p4));
       break;
-    case rectMode::CORNER:
-      rct = D2D1::RectF(p1, p2, p1 + p3, p2 + p4);
+    case quadMode_t::CORNER:
+      rct = D2D1::RectF(FLOAT(p1), FLOAT(p2), FLOAT(p1 + p3), FLOAT(p2 + p4));
       break;
-    case rectMode::CORNERS:
-      rct = D2D1::RectF(p1, p2, p3, p4);
+    case quadMode_t::CORNERS:
+      rct = D2D1::RectF(FLOAT(p1), FLOAT(p2), FLOAT(p3), FLOAT(p4));
       break;
     default:
       throw xfunction_error("Invalid rectMode");
   }
-  hr = __private::pRenderTarget->DrawRect(rct, __private::strokebrush, __private::strokewidth, NULL);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
-  hr = __private::pRenderTarget->FillRect(rct, __private::fillbrush);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::ellipse failed");
-  __private::staticvarlock.release();
+  __private::pRenderTarget->DrawRectangle(rct, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->FillRectangle(rct, __private::fillbrush);
+  __private::staticvarlock.unlock();
 }
-void prxx::triangle(unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3){
+
+void prxx::triangle(double x1, double y1, double x2, double y2, double x3, double y3){
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling
-  __private::staticvarlock.aquire();
-  if(__private::cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
-  __private::staticvarlock.release();
+  __private::staticvarlock.lock();
+  if(__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
+  __private::staticvarlock.unlock();
   ID2D1PathGeometry *path;
   hr = __private::pFactory->CreatePathGeometry(&path);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
   ID2D1GeometrySink *sink;
-  hr = path->OpenSink(&sink);
+  hr = path->Open(&sink);
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
-  sink->BeginFigure(D2D1::PointF(x1, y1));
-  sink->AddLine(D2D1::PointF(x2, y2));
-  sink->AddLine(D2D1::PointF(x3, y3));
-  sink->AddLine(D2D1::PointF(x1, y1));
+  sink->BeginFigure(D2D1::Point2F(FLOAT(x1), FLOAT(y1)), D2D1_FIGURE_BEGIN::D2D1_FIGURE_BEGIN_FILLED);
+  sink->AddLine(D2D1::Point2F(FLOAT(x2), FLOAT(y2)));
+  sink->AddLine(D2D1::Point2F(FLOAT(x3), FLOAT(y3)));
+  sink->AddLine(D2D1::Point2F(FLOAT(x1), FLOAT(y1)));
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
-  __private::staticvarlock.aquire();
+  __private::staticvarlock.lock();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
-  hr = __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, __private::strokewidth, NULL);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
-  hr = __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
-  if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
-  __private::staticvarlock.release();
+  __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
+  __private::staticvarlock.unlock();
 }
 
