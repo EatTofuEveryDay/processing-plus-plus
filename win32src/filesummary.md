@@ -6,7 +6,6 @@
 
 `win32private.h`:
 - Declares static variables in the prxx::__private namespace
-- Define the macro EXT as /* */ to make non-extern
 
 `win32ev.cpp`:
 - Implements the processing events
@@ -14,3 +13,6 @@
 
 `win32impl2d.cpp`:
 - Implements the 2D primitives functions
+
+`win32dmodes.cpp`:
+- Implements drawing style functions
