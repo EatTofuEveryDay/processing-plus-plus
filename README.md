@@ -9,3 +9,6 @@ Links:
 
 v0.0:
 - Status: In development
+
+Note:
+The reason I decided not to support OS X and iOS is that Apple wants you to code with swift, not objective-C like before. I will soon be implementing processing in swift to account for that.
