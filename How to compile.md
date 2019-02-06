@@ -4,14 +4,8 @@ Simple.
 
 1. Build the library.
 
-All platforms:
-  `portsrc/*`
-
-Windows:
+Sources:
   `win32src/*`
-
-Mac:
-  `osxsrc/*`
 
 Produce a .lib or .dll file from these sources.
 
@@ -45,5 +39,3 @@ you can type
 Microsoft Visual Studio:
 
 Set processing.lib as a dependancy.
-
-XCode/Clang/Other: WIP
