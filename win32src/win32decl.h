@@ -9,19 +9,23 @@ class MainWindow : public BaseWindow<MainWindow>
     void    DiscardGraphicsResources();
     void    OnPaint();
     void    Resize();
+    tstring classname;
 
 public:
 
-    MainWindow() {
+  MainWindow() {
 		using namespace prxx::__private;
-		staticvarlock.lock();
+    aquire_lock();
 		pFactory = NULL;
 		pRenderTarget = NULL;
 		fillbrush = NULL;
 		strokebrush = NULL;
 		staticvarlock.unlock();
+    // use pointer values to generate a random hex number
+    classname = tstring(_T("ProcessingPlusPlus-wnd")) + to_tstring(reinterpret_cast<long long>("hex"));
+    OutputDebugString(classname.c_str());
 	}
 
-    PCWSTR  ClassName() const { return prxx::__private::title.c_str(); }
+    LPCWSTR ClassName() const { return classname.c_str(); }
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };

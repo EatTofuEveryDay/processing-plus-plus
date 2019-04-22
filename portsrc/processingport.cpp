@@ -3,7 +3,7 @@
 #include<string>
 #include<cmath>
 
-prxx::color_t prxx::color(int r, int g, int b, int a = 0){
+prxx::color_t prxx::color(int r, int g, int b, int a){
   prxx::color_t c;
   c.r = r;
   c.g = g;

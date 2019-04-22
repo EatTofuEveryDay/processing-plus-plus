@@ -14,7 +14,7 @@ bool prxx::__private::operator!=(prxx::__private::runningFunc a, prxx::__private
 
 // Just the 2d primitives in this file
 void prxx::createCanvas(double w, double h){
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if(__private::cfn != __private::runningFunc::setup)
     throw xfunction_error("Must call createCanvas() in setup()");
   __private::width = w;
@@ -28,7 +28,7 @@ void prxx::arc(double x, double y, double w, double h, double start, double stop
   // I was honestly blown away by the amount of code required to make a simple arc.
   // Use the (to be implemented) path_t class to store long sequences of arc commands.
   // Try not to call this func alone, it introduces much overhead
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::staticvarlock.unlock();
   HRESULT hr; // C-style error handling
@@ -72,14 +72,14 @@ void prxx::arc(double x, double y, double w, double h, double start, double stop
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
   SafeRelease(&sink);
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::arc failed");
   __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
   __private::pRenderTarget->DrawGeometry(path, __private::fillbrush);
   __private::staticvarlock.unlock();
 }
 void prxx::ellipse(double p1, double p2, double p3, double p4){
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::staticvarlock.unlock();
   D2D1_ELLIPSE ellipse;
@@ -116,7 +116,7 @@ void prxx::quad(double x1, double y1, double x2, double y2, double x3, double y3
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling, I hate winapi
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::staticvarlock.unlock();
   ID2D1PathGeometry *path;
@@ -133,26 +133,26 @@ void prxx::quad(double x1, double y1, double x2, double y2, double x3, double y3
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
   if (!SUCCEEDED(hr)) throw drawing_error("prxx::quad failed");
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
   __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
   __private::staticvarlock.unlock();
 }
 void prxx::point(double x, double y){
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if(__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::staticvarlock.unlock();
   line(x, y, x+1, y+1); // No other way to draw a point.
 }
 void prxx::line(double x1, double y1, double x2, double y2){
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if (__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::pRenderTarget->DrawLine(D2D1::Point2F(FLOAT(x1), FLOAT(y1)), D2D1::Point2F(FLOAT(x2), FLOAT(y2)), __private::strokebrush, FLOAT(__private::strokewidth), NULL);
   __private::staticvarlock.unlock();
 }
 void prxx::rect(double p1, double p2, double p3, double p4){
   using namespace prxx::__private;
-  staticvarlock.lock();
+  aquire_lock();
   if(cfn != runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   D2D1_RECT_F rct;
   switch(__private::rectmode){
@@ -171,16 +171,16 @@ void prxx::rect(double p1, double p2, double p3, double p4){
     default:
       throw xfunction_error("Invalid rectMode");
   }
-  __private::pRenderTarget->DrawRectangle(rct, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
-  __private::pRenderTarget->FillRectangle(rct, __private::fillbrush);
-  __private::staticvarlock.unlock();
+  pRenderTarget->DrawRectangle(rct, strokebrush, FLOAT(strokewidth), NULL);
+  pRenderTarget->FillRectangle(rct, fillbrush);
+  staticvarlock.unlock();
 }
 
 void prxx::triangle(double x1, double y1, double x2, double y2, double x3, double y3){
   // The problem here is also with overhead.
   // Use the (to be implemented) path_t
   HRESULT hr; // C-style error handling
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if(__private::cfn != __private::runningFunc::draw) throw xfunction_error("Must draw only in draw()");
   __private::staticvarlock.unlock();
   ID2D1PathGeometry *path;
@@ -195,10 +195,15 @@ void prxx::triangle(double x1, double y1, double x2, double y2, double x3, doubl
   sink->AddLine(D2D1::Point2F(FLOAT(x1), FLOAT(y1)));
   sink->EndFigure(D2D1_FIGURE_END_OPEN);
   hr = sink->Close();
-  __private::staticvarlock.lock();
+  __private::aquire_lock();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
   __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
   __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
   __private::staticvarlock.unlock();
 }
 
+void prxx::text(tstring str, double x, double y) {
+  __private::aquire_lock();
+	__private::pRenderTarget->DrawTextW(str.c_str(), str.size(), NULL, D2D1::RectF(FLOAT(x), FLOAT(y), 100, 100), __private::fillbrush);
+  __private::staticvarlock.unlock();
+}

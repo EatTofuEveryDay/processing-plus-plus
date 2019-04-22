@@ -27,7 +27,7 @@
 HRESULT MainWindow::CreateGraphicsResources()
 {
     using namespace prxx::__private;
-    staticvarlock.lock();
+    aquire_lock();
     HRESULT hr = S_OK;
     if (pRenderTarget == NULL)
     {
@@ -54,7 +54,7 @@ HRESULT MainWindow::CreateGraphicsResources()
 void MainWindow::DiscardGraphicsResources()
 {
     using namespace prxx::__private;
-    staticvarlock.lock();
+    aquire_lock();
     SafeRelease(&pRenderTarget);
     SafeRelease(&fillbrush);
     SafeRelease(&strokebrush);
@@ -66,7 +66,7 @@ void MainWindow::OnPaint()
   using namespace prxx::__private;
   prxx::fill(fillcol);
   prxx::stroke(strokecol);
-  staticvarlock.lock();
+  aquire_lock();
   HRESULT hr = CreateGraphicsResources();
   if (SUCCEEDED(hr))
   {
@@ -88,7 +88,7 @@ void MainWindow::OnPaint()
 void MainWindow::Resize()
 {
   using namespace prxx::__private;
-  staticvarlock.lock();
+  aquire_lock();
   if (pRenderTarget != NULL)
   {
     RECT rc;
@@ -102,10 +102,11 @@ void MainWindow::Resize()
 }
 
 // WinMain?
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, int nCmdShow)
 {
+  
   using namespace prxx::__private;
-  staticvarlock.lock();
+  aquire_lock();
   cfn = runningFunc::setup;
   // Avoid double aquire
   staticvarlock.unlock();
@@ -114,12 +115,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
   setup(); // processing function
   
   // Check if width and height are 0
-  staticvarlock.lock();
+  aquire_lock();
   if(!(width + height))
     return 0;
-
-  if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, 0, (int)std::floor(width), (int)std::floor(height)))
-    return 0;
+  
+  if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, hInstance, WS_EX_LEFT, CW_USEDEFAULT, CW_USEDEFAULT, (int)std::floor(width), (int)std::floor(height)))
+    return 0xbad;
+  
   staticvarlock.unlock();
   ShowWindow(win.Window(), nCmdShow);
 
@@ -138,48 +140,38 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
   using namespace prxx::__private;
-    switch (uMsg)
-    {
-    case WM_CREATE:
-        staticvarlock.lock();
-        if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
-          std::abort();
-        staticvarlock.unlock();
-        return 0;
+  switch (uMsg)
+  {
+  case WM_CREATE:
+    aquire_lock();
+    if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
+      std::abort();
+    staticvarlock.unlock();
+    return 0;
 
-    case WM_DESTROY:
-        DiscardGraphicsResources();
-        staticvarlock.lock();
-        SafeRelease(&pFactory);
-        PostQuitMessage(0);
-        staticvarlock.unlock();
-        return 0;
+  case WM_DESTROY:
+    DiscardGraphicsResources();
+    aquire_lock();
+    SafeRelease(&pFactory);
+    PostQuitMessage(0);
+    staticvarlock.unlock();
+    return 0;
 
-    case WM_PAINT:
-        OnPaint();
-        return 0;
+  case WM_PAINT:
+    OnPaint();
+    return 0;
 
-    case WM_SIZE:
-        Resize();
-        return 0;
+  case WM_SIZE:
+    Resize();
+    return 0;
+
 	case WM_KEYDOWN:
 		keyPressed((char)wParam);
 		return 0;
+
 	case WM_KEYUP:
 		keyReleased((char)wParam);
 		return 0;
-    }
-    return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+  }
+  return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }
-
-
-// If functions don't exist
-// Avoid undefined reference errors
-// Note: draw and setup must exist
-void mouseClicked(...) {}
-void mouseReleased(...) {}
-void mouseMoved(...) {}
-
-void keyPressed(...) {}
-void keyReleased(...) {}
-void windowResized(...) {}

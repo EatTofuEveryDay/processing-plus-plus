@@ -8,11 +8,11 @@
 #include<exception>
 #include<cmath>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_MSC_VER)
 // Frickin windows API macros
+#include"../win32src/win32fwd.h"
 #undef max
 #undef min
-#include"../win32src/win32fwd.h"
 #endif
 
 // processing reference
@@ -61,15 +61,15 @@ namespace prxx {
     unsigned int a : 8;
   };
   
-  void background(int, int, int, int);
+  void background(int, int, int, int = 0);
   void background(color_t);
-  void fill(int, int, int, int);
+  void fill(int, int, int, int = 0);
   void fill(color_t);
   void noFill(void);
-  void stroke(int, int, int, int);
+  void stroke(int, int, int, int = 0);
   void stroke(color_t);
   void noStroke(void);
-  color_t color(int, int, int, int);
+  color_t color(int, int, int, int = 0);
   int alpha(color_t);
   int red(color_t);
   int green(color_t);
@@ -90,14 +90,15 @@ namespace prxx {
     std::vector<std::vector<color_t> >& bitmap();
     
     void load(void);
+	color_t querypixel(int, int);
   };
   
-  void image(image_t, unsigned int, unsigned int);
+  void image(image_t, double, double);
   void imageMode(quadMode_t);
   
   // Text
-  void text(std::string, unsigned int, unsigned int);
-  void textSize(unsigned int);
+  void text(std::wstring, double, double);
+  void textSize(double);
   
   // debug/control
   void print(std::string);
@@ -189,9 +190,9 @@ namespace prxx {
     
     void open();
     void close();
-    void bezier(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
-    void curve(unsigned int, unsigned int);
-    void line(unsigned int, unsigned int);
+    void bezier(double, double, double, double, double, double);
+    void curve(double, double);
+    void line(double, double);
     void draw();
   };  
   // Exceptions (implemented)
@@ -244,22 +245,11 @@ int setup(void);
 void draw(void);
 void windowResized(unsigned int x, unsigned int y);
 
-void mouseClicked();
-void mouseReleased();
-void mouseMoved();
+void mouseClicked(unsigned int, unsigned int);
+void mouseReleased(unsigned int, unsigned int);
+void mouseMoved(unsigned int, unsigned int);
 
 void keyPressed(char);
 void keyReleased(char);
-
-// If functions don't exist
-// Avoid undefined reference errors
-// Note: draw and setup must exist
-void mouseClicked(...);
-void mouseReleased(...);
-void mouseMoved(...);
-
-void keyPressed(...);
-void keyReleased(...);
-void windowResized(...);
 
 #endif
