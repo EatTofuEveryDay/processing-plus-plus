@@ -5,7 +5,7 @@
 #include<cmath>
 
 #define EXT
-#include"win32private.h"
+#include"private.h"
 
 void prxx::ellipseMode(prxx::quadMode_t t){
   __private::aquire_lock();

@@ -3,7 +3,7 @@
 #include "../include/processing.h"
 
 #define EXT
-#include "win32private.h"
+#include "private.h"
 
 // For SafeRelease
 #include "basewin.h"

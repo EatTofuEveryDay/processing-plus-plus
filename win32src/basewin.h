@@ -1,3 +1,6 @@
+#ifndef BASEWIN_H
+#define BASEWIN_H
+
 #include<windows.h>
 #include<d2d1.h>
 #include<tchar.h>
@@ -76,8 +79,6 @@ public:
       dwExStyle, ClassName(), lpWindowName, dwStyle, x, y,
       nWidth, nHeight, hWndParent, hMenu, hIns, this
     );
-    tstring terr = to_tstring(static_cast<int>(GetLastError()));
-    OutputDebugString(terr.c_str());
     return (m_hwnd ? TRUE : FALSE);
   }
 
@@ -90,3 +91,5 @@ protected:
 
   HWND m_hwnd;
 };
+
+#endif

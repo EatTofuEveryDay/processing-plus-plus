@@ -10,7 +10,7 @@
 
 #if defined(_WIN32) || defined(_MSC_VER)
 // Frickin windows API macros
-#include"../win32src/win32fwd.h"
+#include"../win32src/prxxfwd.h"
 #undef max
 #undef min
 #endif
@@ -236,7 +236,7 @@ namespace prxx {
 
 #ifdef _WIN32
 #define EXT
-#include"../win32src/win32private.h"
+#include"../win32src/private.h"
 #endif
 
 // Events
