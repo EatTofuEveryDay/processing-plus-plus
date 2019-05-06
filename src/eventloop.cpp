@@ -20,7 +20,7 @@
 
 // Recalculate drawing layout when the size of the window changes.
 
-HRESULT MainWindow::CreateGraphicsResources()
+void MainWindow::CreateGraphicsResources()
 {
   using namespace prxx::__private;
   aquire_lock();
@@ -60,7 +60,6 @@ HRESULT MainWindow::CreateGraphicsResources()
     }
   }
   staticvarlock.unlock();
-  return hr;
 }
 
 void MainWindow::DiscardGraphicsResources()
@@ -77,24 +76,21 @@ void MainWindow::OnPaint()
 {
   using namespace prxx::__private;
   aquire_lock();
-  HRESULT hr = CreateGraphicsResources();
+  CreateGraphicsResources();
   prxx::fill(fillcol);
   prxx::stroke(strokecol);
-  if (SUCCEEDED(hr))
-  {
-    PAINTSTRUCT ps;
-    BeginPaint(m_hwnd, &ps);
-    pRenderTarget->BeginDraw();
-    // make sure that processing draw calls are being called in draw()
-    cfn = runningFunc::draw;
-    draw(); // processing function
-    cfn = runningFunc::null;
-    hr = pRenderTarget->EndDraw();
-    if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET) {
-      DiscardGraphicsResources();
-      CreateGraphicsResources();
-    }
 
+  PAINTSTRUCT ps;
+  BeginPaint(m_hwnd, &ps);
+  pRenderTarget->BeginDraw();
+  // make sure that processing draw calls are being called in draw()
+  cfn = runningFunc::draw;
+  draw(); // processing function
+  cfn = runningFunc::null;
+  HRESULT hr = pRenderTarget->EndDraw();
+  if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET) {
+    DiscardGraphicsResources();
+    CreateGraphicsResources();
     EndPaint(m_hwnd, &ps);
   }
   staticvarlock.unlock();

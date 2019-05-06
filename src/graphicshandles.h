@@ -50,6 +50,7 @@ HRESULT D2DGraphicsHandle<ID2D1Factory>::Create();
 template<class T>
 void D2DGraphicsHandle<T>::Release() {
   SafeRelease(&pResource);
+  pResource = nullptr;
 }
 
 template<class T>

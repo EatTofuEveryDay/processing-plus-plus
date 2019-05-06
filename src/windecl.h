@@ -5,7 +5,7 @@
 class MainWindow : public BaseWindow<MainWindow>
 {
 
-    HRESULT CreateGraphicsResources();
+    void    CreateGraphicsResources();
     void    DiscardGraphicsResources();
     void    OnPaint();
     void    Resize();

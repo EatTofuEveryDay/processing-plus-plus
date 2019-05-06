@@ -171,7 +171,7 @@ void prxx::rect(double p1, double p2, double p3, double p4){
     default:
       throw xfunction_error("Invalid rectMode");
   }
-  pRenderTarget->DrawRectangle(rct, strokebrush, FLOAT(strokewidth), NULL);
+  pRenderTarget->DrawRectangle(rct, strokebrush, FLOAT(strokewidth));
   pRenderTarget->FillRectangle(rct, fillbrush);
   staticvarlock.unlock();
 }
