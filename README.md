@@ -8,7 +8,7 @@ Links:
 - https://py.processing.org/ Processing.py
 
 v0.0:
-- Status: In development
+- Status: In development **WARNING does not run, do not use (yet)**
 
 Note:
 The reason I decided not to support OS X and iOS is that Apple wants you to code with swift, not objective-C like before.
