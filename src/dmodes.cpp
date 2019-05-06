@@ -1,4 +1,5 @@
 #include"../include/processing.h"
+#include"private.h"
 
 #include"basewin.h"
 #include<d2d1.h>
@@ -6,6 +7,13 @@
 
 #define EXT
 #include"private.h"
+
+prxx::color_t::color_t() {
+  r = 0;
+  g = 0;
+  b = 0;
+  a = 255;
+}
 
 void prxx::ellipseMode(prxx::quadMode_t t){
   __private::aquire_lock();
@@ -33,14 +41,9 @@ void prxx::background(int r, int g, int b, int a){
 }
 void prxx::fill(int r, int g, int b, int a){
   __private::aquire_lock();
-  HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
-    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255) ),
-    D2D1::BrushProperties(),
-    &__private::fillbrush
+  __private::fillbrush->SetColor(
+    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255))
   );
-  if(!SUCCEEDED(hr)){
-    throw xfunction_error("prxx::fill failed");
-  }
   __private::staticvarlock.unlock();
 }
 void prxx::noFill(void){
@@ -48,13 +51,9 @@ void prxx::noFill(void){
 }
 void prxx::stroke(int r, int g, int b, int a){
   __private::aquire_lock();
-  HRESULT hr = __private::pRenderTarget->CreateSolidColorBrush(
-    D2D1::ColorF(D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255) )),
-    &__private::strokebrush
+  __private::fillbrush->SetColor(
+    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255))
   );
-  if(!SUCCEEDED(hr)){
-    throw xfunction_error("prxx::stroke failed");
-  }
   __private::staticvarlock.unlock();
 }
 void prxx::noStroke(void){

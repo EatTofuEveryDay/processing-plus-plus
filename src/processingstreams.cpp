@@ -1,4 +1,5 @@
 #include "../include/processing.h"
+#include"private.h"
 #include<iostream>
 #include<fstream>
 #include<string>

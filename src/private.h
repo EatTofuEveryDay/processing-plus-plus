@@ -21,10 +21,10 @@
 
 namespace prxx {
   namespace __private {
+    std::mutex staticvarlock;
     void aquire_lock() {
       while (staticvarlock.try_lock()) std::this_thread::sleep_for(std::chrono::milliseconds(0));
     }
-    std::mutex staticvarlock;
     tstring title;
     prxx::color_t fillcol; // Incase fillbrush is ever invalidated
     prxx::color_t strokecol;

@@ -16,10 +16,6 @@ public:
   MainWindow() {
 		using namespace prxx::__private;
     aquire_lock();
-		pFactory = NULL;
-		pRenderTarget = NULL;
-		fillbrush = NULL;
-		strokebrush = NULL;
 		staticvarlock.unlock();
     // use pointer values to generate a random hex number
     classname = tstring(_T("ProcessingPlusPlus-wnd")) + to_tstring(reinterpret_cast<long long>("hex"));

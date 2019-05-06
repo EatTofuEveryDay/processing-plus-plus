@@ -204,6 +204,6 @@ void prxx::triangle(double x1, double y1, double x2, double y2, double x3, doubl
 
 void prxx::text(tstring str, double x, double y) {
   __private::aquire_lock();
-	__private::pRenderTarget->DrawTextW(str.c_str(), str.size(), NULL, D2D1::RectF(FLOAT(x), FLOAT(y), 100, 100), __private::fillbrush);
+	__private::pRenderTarget->DrawTextW(str.c_str(), (UINT32)str.size(), NULL, D2D1::RectF(FLOAT(x), FLOAT(y), 100, 100), __private::fillbrush);
   __private::staticvarlock.unlock();
 }

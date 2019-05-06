@@ -9,8 +9,8 @@
 #include<cmath>
 
 #if defined(_WIN32) || defined(_MSC_VER)
+#include"../src/prxxfwd.h"
 // Frickin windows API macros
-#include"../win32src/prxxfwd.h"
 #undef max
 #undef min
 #endif
@@ -55,6 +55,7 @@ namespace prxx {
   
   // Color
   struct color_t {
+    color_t();
     unsigned int r : 8;
     unsigned int g : 8;
     unsigned int b : 8;
@@ -236,7 +237,7 @@ namespace prxx {
 
 #ifdef _WIN32
 #define EXT
-#include"../win32src/private.h"
+
 #endif
 
 // Events
