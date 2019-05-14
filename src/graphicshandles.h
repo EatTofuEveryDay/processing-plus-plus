@@ -10,13 +10,13 @@
 template<class T>
 class D2DGraphicsHandle;
 
-HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>& renderTarget, ID2D1Factory* pFactory, HWND m_hwnd, D2D1_SIZE_U size);
+HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>& renderTarget, ID2D1Factory* pFactory, HWND m_hwnd);
 
 template<class T>
 class D2DGraphicsHandle {
   T* pResource;
 public:
-  friend HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>&, ID2D1Factory* pFactory, HWND m_hwnd, D2D1_SIZE_U size);
+  friend HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>&, ID2D1Factory* pFactory, HWND m_hwnd);
   D2DGraphicsHandle();
   ~D2DGraphicsHandle();
   HRESULT Create();
@@ -77,6 +77,10 @@ T* D2DGraphicsHandle<T>::operator->()
 template<class T>
 D2DGraphicsHandle<T>::operator T*()
 {
+  // Don't let user access nullptr
+  if (IsNull()) {
+    throw new D2DNullAccessError();
+  }
   return pResource;
 }
 

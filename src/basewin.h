@@ -67,14 +67,8 @@ public:
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hIns;
     wc.lpszClassName = ClassName();
-
-    if (!RegisterClass(&wc)) {
-      tstring terr(to_tstring((int)GetLastError()));
-      OutputDebugString(terr.c_str());
-      while (true);
-    }
-
-
+    RegisterClass(&wc);
+    
     m_hwnd = CreateWindowEx(
       dwExStyle, ClassName(), lpWindowName, dwStyle, x, y,
       nWidth, nHeight, hWndParent, hMenu, hIns, this

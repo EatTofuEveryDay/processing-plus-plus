@@ -17,6 +17,7 @@
 #include "private.h"
 #include "exceptions.h"
 #include "windecl.h"
+#include "debug.h"
 
 // Recalculate drawing layout when the size of the window changes.
 
@@ -27,38 +28,50 @@ void MainWindow::CreateGraphicsResources()
   HRESULT hr = S_OK;
   if (pFactory.IsNull()) {
     hr = pFactory.Create();
+    debuglog(tstring(_T("factory hr:")));
+    debuglog(hr);
+    debuglog(tstring(_T("\n")));
     if (FAILED(hr)) {
       throw new D2DCreateResourceError(std::string("CreateFactory failed with HRESULT ") + std::to_string(hr));
     }
   }
   if (pRenderTarget.IsNull())
   {
-    RECT rc;
-    GetClientRect(m_hwnd, &rc);
-
-    D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-
-    hr = pFactory->CreateHwndRenderTarget(
-      D2D1::RenderTargetProperties(),
-      D2D1::HwndRenderTargetProperties(m_hwnd, size),
-      &pRenderTarget);
-
+    hr = CreateResource(pRenderTarget, pFactory, m_hwnd);
+    debuglog(tstring(_T("rendertarget hr:")));
+    debuglog(hr);
+    debuglog(tstring(_T("\n")));
     if (FAILED(hr))
     {
       throw new D2DCreateResourceError(std::string("CreateHwndRenderTarget failed with HRESULT ") + std::to_string(hr));
     }
-    D2D1_COLOR_F color = D2D1::ColorF(FLOAT(fillcol.r / 255), FLOAT(fillcol.g / 255), FLOAT(fillcol.b / 255), FLOAT(1 - (fillcol.a / 255)));
-    hr = pRenderTarget->CreateSolidColorBrush(color, &fillbrush);
-    if (FAILED(hr))
-    {
-      throw new D2DCreateResourceError(std::string("CreateSolidColorBrush failed with HRESULT ") + std::to_string(hr));
-    }
-    color = D2D1::ColorF(FLOAT(strokecol.r / 255), FLOAT(strokecol.g / 255), FLOAT(strokecol.b / 255), FLOAT(1 - (strokecol.a / 255)));
-    hr = pRenderTarget->CreateSolidColorBrush(color, &fillbrush);
+    // if rendertarget is null, make sure brushes are null so we can recreate them
+    strokebrush.Release();
+    fillbrush.Release();
+  }
+  if (strokebrush.IsNull()) {
+    D2D1_COLOR_F color = D2D1::ColorF(FLOAT(strokecol.r / 255), FLOAT(strokecol.g / 255), FLOAT(strokecol.b / 255), FLOAT(1 - (strokecol.a / 255)));
+    hr = pRenderTarget->CreateSolidColorBrush(color, &strokebrush);
+    debuglog(tstring(_T("strokebrush hr:")));
+    debuglog(hr);
+    debuglog(tstring(_T("\n")));
     if (FAILED(hr)) {
       throw new D2DCreateResourceError(std::string("CreateSolidColorBrush failed with HRESULT ") + std::to_string(hr));
     }
   }
+  if (fillbrush.IsNull()) {
+    D2D1_COLOR_F color = D2D1::ColorF(FLOAT(fillcol.r / 255), FLOAT(fillcol.g / 255), FLOAT(fillcol.b / 255), FLOAT(fillcol.a / 255));
+    hr = pRenderTarget->CreateSolidColorBrush(color, &fillbrush);
+    debuglog(tstring(_T("fillbrush hr:")));
+    debuglog(hr);
+    debuglog(tstring(_T("\n")));
+    if (FAILED(hr)) {
+      throw new D2DCreateResourceError(std::string("CreateSolidColorBrush failed with HRESULT ") + std::to_string(hr));
+    }
+  }
+  debuglog("strokebrush*:");
+  debuglog(*&strokebrush);
+  debuglog("\n");
   staticvarlock.unlock();
 }
 
@@ -77,9 +90,6 @@ void MainWindow::OnPaint()
   using namespace prxx::__private;
   aquire_lock();
   CreateGraphicsResources();
-  prxx::fill(fillcol);
-  prxx::stroke(strokecol);
-
   PAINTSTRUCT ps;
   BeginPaint(m_hwnd, &ps);
   pRenderTarget->BeginDraw();
@@ -90,9 +100,8 @@ void MainWindow::OnPaint()
   HRESULT hr = pRenderTarget->EndDraw();
   if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET) {
     DiscardGraphicsResources();
-    CreateGraphicsResources();
-    EndPaint(m_hwnd, &ps);
   }
+  EndPaint(m_hwnd, &ps);
   staticvarlock.unlock();
 }
 
@@ -112,10 +121,8 @@ void MainWindow::Resize()
   staticvarlock.unlock();
 }
 
-// WinMain?
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, int nCmdShow)
 {
-
   using namespace prxx::__private;
   aquire_lock();
   cfn = runningFunc::setup;
@@ -124,7 +131,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, int nCmdShow)
   MainWindow win;
 
   setup(); // processing function
-
   // Check if width and height are 0
   aquire_lock();
   if (!(width + height))
@@ -132,13 +138,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, int nCmdShow)
 
   if (!win.Create(title.c_str(), WS_OVERLAPPEDWINDOW, hInstance, WS_EX_LEFT, CW_USEDEFAULT, CW_USEDEFAULT, (int)std::floor(width), (int)std::floor(height)))
     return 1;
-
   staticvarlock.unlock();
   ShowWindow(win.Window(), nCmdShow);
 
   // Run the message loop.
 
-  MSG msg{ };
+  MSG msg { };
   while (GetMessage(&msg, NULL, 0, 0)) {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
@@ -154,10 +159,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
   switch (uMsg)
   {
   case WM_CREATE: {
-    aquire_lock();
-    if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
-      std::abort();
-    staticvarlock.unlock();
+    CreateGraphicsResources();
     return 0;
   }
 

@@ -2,6 +2,7 @@
 #include"private.h"
 
 #include"basewin.h"
+#include"debug.h"
 #include<d2d1.h>
 #include<cmath>
 
@@ -42,8 +43,12 @@ void prxx::background(int r, int g, int b, int a){
 void prxx::fill(int r, int g, int b, int a){
   __private::aquire_lock();
   __private::fillbrush->SetColor(
-    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255))
+    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, FLOAT(a) / 255)
   );
+  __private::fillcol.r = r;
+  __private::fillcol.g = g;
+  __private::fillcol.b = b;
+  __private::fillcol.a = a;
   __private::staticvarlock.unlock();
 }
 void prxx::noFill(void){
@@ -52,8 +57,12 @@ void prxx::noFill(void){
 void prxx::stroke(int r, int g, int b, int a){
   __private::aquire_lock();
   __private::fillbrush->SetColor(
-    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, 1 - (FLOAT(a) / 255))
+    D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, FLOAT(a) / 255)
   );
+  __private::strokecol.r = r;
+  __private::strokecol.g = g;
+  __private::strokecol.b = b;
+  __private::strokecol.a = a;
   __private::staticvarlock.unlock();
 }
 void prxx::noStroke(void){

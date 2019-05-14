@@ -62,15 +62,15 @@ namespace prxx {
     unsigned int a : 8;
   };
   
-  void background(int, int, int, int = 0);
+  void background(int, int, int, int = 255);
   void background(color_t);
-  void fill(int, int, int, int = 0);
+  void fill(int, int, int, int = 255);
   void fill(color_t);
   void noFill(void);
-  void stroke(int, int, int, int = 0);
+  void stroke(int, int, int, int = 255);
   void stroke(color_t);
   void noStroke(void);
-  color_t color(int, int, int, int = 0);
+  color_t color(int, int, int, int = 255);
   int alpha(color_t);
   int red(color_t);
   int green(color_t);

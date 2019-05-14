@@ -7,6 +7,7 @@
 
 // For SafeRelease
 #include "basewin.h"
+#include "debug.h"
 
 bool prxx::__private::operator!=(prxx::__private::runningFunc a, prxx::__private::runningFunc b) {
 	return !(a == b);
@@ -173,6 +174,10 @@ void prxx::rect(double p1, double p2, double p3, double p4){
   }
   pRenderTarget->DrawRectangle(rct, strokebrush, FLOAT(strokewidth));
   pRenderTarget->FillRectangle(rct, fillbrush);
+  /*tstring dbgstr = to_tstring(reinterpret_cast<long long>(ptr));
+  OutputDebugString(dbgstr.c_str());
+  ptr->DrawRectangle(rct, strokebrush, FLOAT(strokewidth));
+  ptr->FillRectangle(rct, fillbrush);//*/
   staticvarlock.unlock();
 }
 
@@ -197,13 +202,13 @@ void prxx::triangle(double x1, double y1, double x2, double y2, double x3, doubl
   hr = sink->Close();
   __private::aquire_lock();
   if(!SUCCEEDED(hr)) throw drawing_error("prxx::triangle failed");
-  __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth), NULL);
+  __private::pRenderTarget->DrawGeometry(path, __private::strokebrush, FLOAT(__private::strokewidth));
   __private::pRenderTarget->FillGeometry(path, __private::fillbrush);
   __private::staticvarlock.unlock();
 }
 
 void prxx::text(tstring str, double x, double y) {
   __private::aquire_lock();
-	__private::pRenderTarget->DrawTextW(str.c_str(), (UINT32)str.size(), NULL, D2D1::RectF(FLOAT(x), FLOAT(y), 100, 100), __private::fillbrush);
+	__private::pRenderTarget->DrawText(str.c_str(), (UINT32)str.size(), NULL, D2D1::RectF(FLOAT(x), FLOAT(y), 100, 100), __private::fillbrush);
   __private::staticvarlock.unlock();
 }

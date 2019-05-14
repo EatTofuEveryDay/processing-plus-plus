@@ -18,8 +18,7 @@ public:
     aquire_lock();
 		staticvarlock.unlock();
     // use pointer values to generate a random hex number
-    classname = tstring(_T("ProcessingPlusPlus-wnd")) + to_tstring(reinterpret_cast<long long>("hex"));
-    OutputDebugString(classname.c_str());
+    classname = tstring(_T("ProcessingPlusPlus-wnd")) + to_tstring(reinterpret_cast<long long>(&m_hwnd));
 	}
 
     LPCWSTR ClassName() const { return classname.c_str(); }
