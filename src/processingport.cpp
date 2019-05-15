@@ -130,35 +130,35 @@ double prxx::round(double);
 double prxx::sq(double);
 double prxx::sqrt(double);
 
-prxx::argument_error::argument_error(std::string w) : pw {w} {}
+prxx::ArgumentError::ArgumentError(std::string w) : pw {w} {}
 
-prxx::argument_error::~argument_error(void) {}
+prxx::ArgumentError::~ArgumentError(void) {}
 
-std::string prxx::argument_error::what(){
+std::string prxx::ArgumentError::what(){
   return pw;
 }
 
-prxx::xfunction_error::xfunction_error(std::string w) : pw{w} {}
+prxx::XFunctionError::XFunctionError(std::string w) : pw{w} {}
 
-prxx::xfunction_error::~xfunction_error(void) {}
+prxx::XFunctionError::~XFunctionError(void) {}
 
-std::string prxx::xfunction_error::what(){
+std::string prxx::XFunctionError::what(){
   return pw;
 }
 
-prxx::not_implemented_error::not_implemented_error(std::string w) : pw{w} {}
+prxx::NotImplementedError::NotImplementedError(std::string w) : pw{w} {}
 
-prxx::not_implemented_error::~not_implemented_error(void) {}
+prxx::NotImplementedError::~NotImplementedError(void) {}
 
-std::string prxx::not_implemented_error::what(){
+std::string prxx::NotImplementedError::what(){
   return pw;
 }
 
-prxx::drawing_error::drawing_error(std::string w) : pw{w} {}
+prxx::DrawingError::DrawingError(std::string w) : pw{w} {}
 
-prxx::drawing_error::~drawing_error(void) {}
+prxx::DrawingError::~DrawingError(void) {}
 
-std::string prxx::drawing_error::what(){
+std::string prxx::DrawingError::what(){
   return pw;
 }
 

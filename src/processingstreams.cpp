@@ -10,23 +10,23 @@ std::ostream& operator<<(std::ostream& out, prxx::color_t c){
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::argument_error e){
-  out << "Caught prxx::argument_error: " << e.what();
+std::ostream& operator<<(std::ostream& out, prxx::ArgumentError e){
+  out << "Caught prxx::ArgumentError: " << e.what();
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::xfunction_error e){
-  out << "Caught prxx::xfunction_error: " << e.what();
+std::ostream& operator<<(std::ostream& out, prxx::XFunctionError e){
+  out << "Caught prxx::XFunctionError: " << e.what();
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::not_implemented_error e){
-  out << "Caught prxx::not_implemented_error: " << e.what();
+std::ostream& operator<<(std::ostream& out, prxx::NotImplementedError e){
+  out << "Caught prxx::NotImplementedError: " << e.what();
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, prxx::drawing_error e){
-  out << "Caught prxx::drawing_error: " << e.what();
+std::ostream& operator<<(std::ostream& out, prxx::DrawingError e){
+  out << "Caught prxx::DrawingError: " << e.what();
   return out;
 }
 
@@ -39,13 +39,13 @@ void prxx::print(std::string s){
   std::cout.flush();
 }
 
-prxx::file_t::file_t(){}
+prxx::PFile::PFile(){}
 
-prxx::file_t::file_t(std::string path, prxx::openmode o){
+prxx::PFile::PFile(std::string path, prxx::openmode o){
   open(path, o);
 }
 
-void prxx::file_t::open(std::string path, prxx::openmode o){
+void prxx::PFile::open(std::string path, prxx::openmode o){
   int i = int(o);
   std::ios_base::openmode openm;
   if(i & int(prxx::openmode::read))
@@ -61,7 +61,7 @@ void prxx::file_t::open(std::string path, prxx::openmode o){
   fp = std::fstream(path, openm);
 }
 
-std::string prxx::file_t::read(){
+std::string prxx::PFile::read(){
   std::string buf;
   std::string tmp;
   while(std::getline(fp, tmp)){
@@ -70,7 +70,7 @@ std::string prxx::file_t::read(){
   return buf;
 }
 
-std::string prxx::file_t::read(unsigned int sz){
+std::string prxx::PFile::read(unsigned int sz){
   char* buf = new char[sz];
   fp.read(buf, sz);
   std::string ret(buf);
@@ -79,10 +79,10 @@ std::string prxx::file_t::read(unsigned int sz){
 }
 
 template<class T>
-void prxx::file_t::write(T str){
+void prxx::PFile::write(T str){
   fp << str;
 }
 
-void prxx::file_t::close(){
+void prxx::PFile::close(){
   fp.close();
 }

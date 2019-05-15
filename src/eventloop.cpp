@@ -69,9 +69,6 @@ void MainWindow::CreateGraphicsResources()
       throw new D2DCreateResourceError(std::string("CreateSolidColorBrush failed with HRESULT ") + std::to_string(hr));
     }
   }
-  debuglog("strokebrush*:");
-  debuglog(*&strokebrush);
-  debuglog("\n");
   staticvarlock.unlock();
 }
 
@@ -115,6 +112,8 @@ void MainWindow::Resize()
     GetClientRect(m_hwnd, &rc);
     D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
     windowResized(size.width, size.height); // processing function
+    width = size.width;
+    height = size.height;
     pRenderTarget->Resize(size);
     InvalidateRect(m_hwnd, NULL, FALSE);
   }
@@ -166,7 +165,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
   case WM_DESTROY:
     DiscardGraphicsResources();
     aquire_lock();
-    SafeRelease(&pFactory);
+    pFactory.Release();
     PostQuitMessage(0);
     staticvarlock.unlock();
     return 0;

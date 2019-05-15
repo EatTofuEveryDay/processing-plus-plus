@@ -20,7 +20,7 @@
 
 namespace prxx {
   namespace __private { /* Implementation-defined */
-	class base_path;
+	  class base_path;
   }
   enum class arcmode {
 	  OPEN, CHORD, PIE
@@ -77,24 +77,24 @@ namespace prxx {
   int blue(color_t);
   
   // Imaging
-  class image_t {
+  class PImage {
     std::string src;
     std::vector<std::vector<color_t> > bmp;
   public:
-    image_t();
-    image_t(std::string src);
-    image_t(int, int);
-    image_t(image_t&);
+    PImage();
+    PImage(std::string src);
+    PImage(int, int);
+    PImage(PImage&);
     
     // Access
     std::string& source();
     std::vector<std::vector<color_t> >& bitmap();
     
     void load(void);
-	color_t querypixel(int, int);
+	  color_t& querypixel(int, int);
   };
   
-  void image(image_t, double, double);
+  void image(PImage, double, double);
   void imageMode(quadMode_t);
   
   // Text
@@ -162,11 +162,11 @@ namespace prxx {
     trunc = 0x8,
     binary = 0x10
   };
-  class file_t {
+  class PFile {
     std::fstream fp;
   public:
-    file_t();
-    file_t(std::string, openmode);
+    PFile();
+    PFile(std::string, openmode);
 	// Not Copy-constructible
     
     void open(std::string, openmode);
@@ -183,11 +183,11 @@ namespace prxx {
   // Extensions
   void windowTitle(std::string);
   void windowIcon(std::string);
-  class path_t {
-    __private::base_path p; // Implementation
+  class PPath {
+    __private::base_path& p; // Implementation
   public:
-    path_t();
-    ~path_t();
+    PPath();
+    ~PPath();
     
     void open();
     void close();
@@ -195,41 +195,41 @@ namespace prxx {
     void curve(double, double);
     void line(double, double);
     void draw();
-  };  
+  };
+
   // Exceptions (implemented)
-  
-  class argument_error : public std::exception {
+  class ArgumentError : public std::exception {
     std::string pw;
   public:
-    argument_error(std::string w);
-    ~argument_error(void) override;
+    ArgumentError(std::string w);
+    ~ArgumentError(void) override;
     
     std::string what();
   };
   
-  class xfunction_error : public std::exception {
+  class XFunctionError : public std::exception {
     std::string pw;
   public:
-    xfunction_error(std::string w);
-    ~xfunction_error(void) override;
+    XFunctionError(std::string w);
+    ~XFunctionError(void) override;
     
     std::string what();
   };
   
-  class not_implemented_error : public std::exception {
+  class NotImplementedError : public std::exception {
     std::string pw;
   public:
-    not_implemented_error(std::string w);
-    ~not_implemented_error(void) override;
+    NotImplementedError(std::string w);
+    ~NotImplementedError(void) override;
     
     std::string what();
   };
   
-  class drawing_error : public std::exception {
+  class DrawingError : public std::exception {
     std::string pw;
   public:
-    drawing_error(std::string w);
-    ~drawing_error(void) override;
+    DrawingError(std::string w);
+    ~DrawingError(void) override;
     
     std::string what();
   };
@@ -246,7 +246,7 @@ int setup(void);
 void draw(void);
 void windowResized(unsigned int x, unsigned int y);
 
-void mouseClicked(unsigned int, unsigned int);
+void mousePressed(unsigned int, unsigned int);
 void mouseReleased(unsigned int, unsigned int);
 void mouseMoved(unsigned int, unsigned int);
 
