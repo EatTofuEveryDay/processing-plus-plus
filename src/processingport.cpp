@@ -3,9 +3,10 @@
 #include<iostream>
 #include<string>
 #include<cmath>
+#include<chrono>
 
-prxx::color_t prxx::color(int r, int g, int b, int a){
-  prxx::color_t c;
+prxx::PColor prxx::color(int r, int g, int b, int a){
+  prxx::PColor c;
   c.r = r;
   c.g = g;
   c.b = b;
@@ -13,31 +14,31 @@ prxx::color_t prxx::color(int r, int g, int b, int a){
   return c;
 }
 
-int prxx::red(color_t c){
+int prxx::red(PColor c){
   return c.r;
 }
 
-int prxx::green(color_t c){
+int prxx::green(PColor c){
   return c.g;
 }
 
-int prxx::blue(color_t c){
+int prxx::blue(PColor c){
   return c.b;
 }
 
-int prxx::alpha(color_t c){
+int prxx::alpha(PColor c){
   return c.a;
 }
 
-void prxx::background(color_t c){
+void prxx::background(PColor c){
   background(c.r, c.g, c.b, c.a);
 }
 
-void prxx::fill(color_t c){
+void prxx::fill(PColor c){
   fill(c.r, c.g, c.b, c.a);
 }
 
-void prxx::stroke(color_t c){
+void prxx::stroke(PColor c){
   stroke(c.r, c.g, c.b, c.a);
 }
 
@@ -124,11 +125,30 @@ T prxx::min(std::vector<T> v){
   return curr;
 }
 
-double prxx::norm(double, double, double);
-double prxx::pow(double, double);
-double prxx::round(double);
-double prxx::sq(double);
-double prxx::sqrt(double);
+double prxx::norm(double val, double lower, double upper) {
+  return map(val, lower, upper, 0, 1);
+}
+
+double prxx::pow(double x, double y) {
+  return std::pow(x, y);
+}
+
+double prxx::round(double x) {
+  return std::round(x);
+}
+
+double prxx::sq(double x){
+  return std::pow(x, 2);
+}
+
+double prxx::sqrt(double x) {
+  return std::sqrt(x);
+}
+
+long long prxx::millis() {
+  using namespace std::chrono;
+  return (time_point_cast<milliseconds>(high_resolution_clock::now()) - prxx::__private::programstart).count();
+}
 
 prxx::ArgumentError::ArgumentError(std::string w) : pw {w} {}
 

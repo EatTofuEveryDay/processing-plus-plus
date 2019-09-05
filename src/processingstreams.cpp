@@ -4,7 +4,7 @@
 #include<fstream>
 #include<string>
 
-std::ostream& operator<<(std::ostream& out, prxx::color_t c){
+std::ostream& operator<<(std::ostream& out, prxx::PColor c){
   out << "Color r: " << red(c) << ", g: " << green(c) << ", b: " << blue(c);
   if(alpha(c)) out << ", a: " << alpha(c);
   return out;

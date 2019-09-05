@@ -6,6 +6,7 @@ HRESULT D2DGraphicsHandle<ID2D1Factory>::Create() {
   return D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pResource);
 }
 
+template<>
 HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>& renderTarget, ID2D1Factory* pFactory, HWND m_hwnd) {
   RECT rc;
   GetClientRect(m_hwnd, &rc);

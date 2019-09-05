@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <cstdlib>
 #include <string>
 
@@ -12,9 +13,8 @@
 
 #include "../include/processing.h"
 
-#undef EXT
 // Not external
-#include "private.h"
+#include "defprivate.h"
 #include "exceptions.h"
 #include "windecl.h"
 #include "debug.h"
@@ -49,6 +49,15 @@ void MainWindow::CreateGraphicsResources()
     strokebrush.Release();
     fillbrush.Release();
   }
+  if (pWriteFactory.IsNull()) {
+    hr = DWriteCreateFactory(
+      DWRITE_FACTORY_TYPE_SHARED,
+      __uuidof(IDWriteFactory),
+      reinterpret_cast<IUnknown * *>(&pWriteFactory));
+    if (FAILED(hr)) {
+      throw new D2DCreateResourceError(std::string("DWriteCreateFactory failed with HRESULT ") + std::to_string(hr));
+    }
+  }
   if (strokebrush.IsNull()) {
     D2D1_COLOR_F color = D2D1::ColorF(FLOAT(strokecol.r / 255), FLOAT(strokecol.g / 255), FLOAT(strokecol.b / 255), FLOAT(1 - (strokecol.a / 255)));
     hr = pRenderTarget->CreateSolidColorBrush(color, &strokebrush);
@@ -68,6 +77,18 @@ void MainWindow::CreateGraphicsResources()
     if (FAILED(hr)) {
       throw new D2DCreateResourceError(std::string("CreateSolidColorBrush failed with HRESULT ") + std::to_string(hr));
     }
+  }
+  if (textformat == nullptr) {
+    IDWriteFontFamily* pFontFamily = nullptr;
+    IDWriteFontCollection* pFontCollection = nullptr;
+    hr = pWriteFactory->GetSystemFontCollection(&pFontCollection);
+    if(FAILED(hr)) throw new D2DCreateResourceError(std::string("GetSystemFontCollection failed with HRESULT ") + std::to_string(hr));
+    hr = pFontCollection->GetFontFamily(0, &pFontFamily);
+    if(FAILED(hr)) throw new D2DCreateResourceError(std::string("GetFontFamily failed with HRESULT ") + std::to_string(hr));
+    D2DGraphicsHandle<IDWriteLocalizedStrings> pNameStrings;
+    hr = pFontFamily->GetFamilyNames(&pNameStrings);
+    if (FAILED(hr)) throw new D2DCreateResourceError(std::string("GetFamilyNames failed with HRESULT ") + std::to_string(hr));
+
   }
   staticvarlock.unlock();
 }

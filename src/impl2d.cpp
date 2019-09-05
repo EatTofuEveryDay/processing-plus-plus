@@ -86,22 +86,22 @@ void prxx::ellipse(double p1, double p2, double p3, double p4){
   D2D1_ELLIPSE ellipse;
   D2D_POINT_2F point;
   switch(__private::ellipsemode){
-    case quadMode_t::CENTER:
+    case QuadMode::CENTER:
       point.x = FLOAT(p1);
       point.y = FLOAT(p2);
       ellipse = D2D1::Ellipse(point, FLOAT(p3), FLOAT(p4));
       break;
-    case quadMode_t::RADIUS:
+    case QuadMode::RADIUS:
       point.x = FLOAT(p1);
       point.y = FLOAT(p2);
       ellipse = D2D1::Ellipse(point, FLOAT(p3 / 2), FLOAT(p4 / 2));
       break;
-    case quadMode_t::CORNER:
+    case QuadMode::CORNER:
       point.x = FLOAT(p1 + p3 / 2);
       point.y = FLOAT(p2 + p4 / 2);
       ellipse = D2D1::Ellipse(point, FLOAT(p3), FLOAT(p4));
       break;
-    case quadMode_t::CORNERS:
+    case QuadMode::CORNERS:
       point.x = FLOAT(p1 + (p3 - p1) / 2);
       point.y = FLOAT(p2 + (p4 - p2) / 2);
       ellipse = D2D1::Ellipse(point, FLOAT(p3 - p1), FLOAT(p4 - p2));
@@ -157,16 +157,16 @@ void prxx::rect(double p1, double p2, double p3, double p4){
   if(cfn != runningFunc::draw) throw XFunctionError("Must draw only in draw()");
   D2D1_RECT_F rct;
   switch(__private::rectmode){
-    case quadMode_t::CENTER:
+    case QuadMode::CENTER:
       rct = D2D1::RectF(FLOAT(p1 - p3/2), FLOAT(p2 - p4/2), FLOAT(p1 + p3/2), FLOAT(p2 + p4/2));
       break;
-    case quadMode_t::RADIUS:
+    case QuadMode::RADIUS:
       rct = D2D1::RectF(FLOAT(p1 - p3), FLOAT(p2 - p4), FLOAT(p1 + p3), FLOAT(p2 + p4));
       break;
-    case quadMode_t::CORNER:
+    case QuadMode::CORNER:
       rct = D2D1::RectF(FLOAT(p1), FLOAT(p2), FLOAT(p1 + p3), FLOAT(p2 + p4));
       break;
-    case quadMode_t::CORNERS:
+    case QuadMode::CORNERS:
       rct = D2D1::RectF(FLOAT(p1), FLOAT(p2), FLOAT(p3), FLOAT(p4));
       break;
     default:

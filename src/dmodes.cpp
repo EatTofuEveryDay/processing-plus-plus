@@ -9,19 +9,19 @@
 #define EXT
 #include"private.h"
 
-prxx::color_t::color_t() {
+prxx::PColor::PColor() {
   r = 0;
   g = 0;
   b = 0;
   a = 255;
 }
 
-void prxx::ellipseMode(prxx::quadMode_t t){
+void prxx::ellipseMode(prxx::QuadMode t){
   __private::aquire_lock();
   __private::ellipsemode = t;
   __private::staticvarlock.unlock();
 }
-void prxx::rectMode(prxx::quadMode_t t){
+void prxx::rectMode(prxx::QuadMode t){
   __private::aquire_lock();
   __private::rectmode = t;
   __private::staticvarlock.unlock();
@@ -56,7 +56,7 @@ void prxx::noFill(void){
 }
 void prxx::stroke(int r, int g, int b, int a){
   __private::aquire_lock();
-  __private::fillbrush->SetColor(
+  __private::strokebrush->SetColor(
     D2D1::ColorF(FLOAT(r) / 255, FLOAT(g) / 255, FLOAT(b) / 255, FLOAT(a) / 255)
   );
   __private::strokecol.r = r;

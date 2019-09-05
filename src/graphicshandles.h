@@ -10,13 +10,15 @@
 template<class T>
 class D2DGraphicsHandle;
 
-HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>& renderTarget, ID2D1Factory* pFactory, HWND m_hwnd);
+template<class T>
+HRESULT CreateResource(D2DGraphicsHandle<T>& renderTarget, ID2D1Factory* pFactory, HWND m_hwnd);
 
 template<class T>
 class D2DGraphicsHandle {
   T* pResource;
 public:
-  friend HRESULT CreateResource(D2DGraphicsHandle<ID2D1HwndRenderTarget>&, ID2D1Factory* pFactory, HWND m_hwnd);
+  template<class T>
+  friend HRESULT CreateResource<>(D2DGraphicsHandle<T>&, ID2D1Factory* pFactory, HWND m_hwnd);
   D2DGraphicsHandle();
   ~D2DGraphicsHandle();
   HRESULT Create();
@@ -41,11 +43,14 @@ D2DGraphicsHandle<T>::~D2DGraphicsHandle() {
 
 template<class T>
 HRESULT D2DGraphicsHandle<T>::Create() {
-  return true;
+  return false;
 }
 
 template<>
 HRESULT D2DGraphicsHandle<ID2D1Factory>::Create();
+
+template<>
+HRESULT D2DGraphicsHandle<IDWriteTextFormat>::Create();
 
 template<class T>
 void D2DGraphicsHandle<T>::Release() {
@@ -60,9 +65,9 @@ bool D2DGraphicsHandle<T>::IsNull()
 }
 
 template<class T>
-void D2DGraphicsHandle<T>::UnsafeSet(T *)
+void D2DGraphicsHandle<T>::UnsafeSet(T * ptr)
 {
-  throw new std::exception("heh heh you thought you could bypass managed resources");
+  pResource = ptr;
 }
 
 template<class T>

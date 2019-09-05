@@ -7,10 +7,11 @@
 #include<fstream>
 #include<exception>
 #include<cmath>
+#include"../src/strings.h"
 
 #if defined(_WIN32) || defined(_MSC_VER)
 #include"../src/prxxfwd.h"
-// Frickin windows API macros
+// Frickin stupid windows API macros
 #undef max
 #undef min
 #endif
@@ -41,11 +42,11 @@ namespace prxx {
   void triangle(double, double, double, double, double, double);
   
   // drawing modes, all implemented except fill() and stroke()
-  enum class quadMode_t {
+  enum class QuadMode {
     CENTER, RADIUS, CORNER, CORNERS
   };
-  void ellipseMode(quadMode_t);
-  void rectMode(quadMode_t);
+  void ellipseMode(QuadMode);
+  void rectMode(QuadMode);
   void strokeWeight(double);
   
   // 2d curves (probably not supported soon)
@@ -54,8 +55,8 @@ namespace prxx {
   double bezierTangent(double, double, double, double, double);
   
   // Color
-  struct color_t {
-    color_t();
+  struct PColor {
+    PColor();
     unsigned int r : 8;
     unsigned int g : 8;
     unsigned int b : 8;
@@ -63,47 +64,49 @@ namespace prxx {
   };
   
   void background(int, int, int, int = 255);
-  void background(color_t);
+  void background(PColor);
   void fill(int, int, int, int = 255);
-  void fill(color_t);
+  void fill(PColor);
   void noFill(void);
   void stroke(int, int, int, int = 255);
-  void stroke(color_t);
+  void stroke(PColor);
   void noStroke(void);
-  color_t color(int, int, int, int = 255);
-  int alpha(color_t);
-  int red(color_t);
-  int green(color_t);
-  int blue(color_t);
+  PColor color(int, int, int, int = 255);
+  int alpha(PColor);
+  int red(PColor);
+  int green(PColor);
+  int blue(PColor);
   
   // Imaging
   class PImage {
     std::string src;
-    std::vector<std::vector<color_t> > bmp;
+    std::vector<std::vector<PColor> > bmp;
   public:
     PImage();
-    PImage(std::string src);
+    PImage(tstring src);
     PImage(int, int);
     PImage(PImage&);
     
     // Access
     std::string& source();
-    std::vector<std::vector<color_t> >& bitmap();
+    std::vector<std::vector<PColor> >& bitmap();
     
     void load(void);
-	  color_t& querypixel(int, int);
+	  PColor& querypixel(int, int);
   };
   
   void image(PImage, double, double);
-  void imageMode(quadMode_t);
+  void imageMode(QuadMode);
+  PImage getImage(std::string);
   
   // Text
-  void text(std::wstring, double, double);
+  void text(tstring, double, double);
   void textSize(double);
   
   // debug/control
   void print(std::string);
   void println(std::string);
+  long long millis(void);
   
   // Math
   double abs(double);
@@ -130,6 +133,9 @@ namespace prxx {
   double round(double);
   double sq(double);
   double sqrt(double);
+  double random();
+  double random(double);
+  double random(double, double);
   
   // Constants
   constexpr double PI = 3.141592653589;
@@ -181,8 +187,8 @@ namespace prxx {
   };
   
   // Extensions
-  void windowTitle(std::string);
-  void windowIcon(std::string);
+  void windowTitle(tstring);
+  void windowIcon(tstring);
   class PPath {
     __private::base_path& p; // Implementation
   public:
